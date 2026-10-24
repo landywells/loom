@@ -29,3 +29,6 @@ qa-*.png
 
 # installers downloaded from CI
 installer/
+
+# downloaded CI artifacts
+apk/

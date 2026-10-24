@@ -69,7 +69,9 @@ jobs:
 
       - name: Build
         env:
-          TAURI_ANDROID_ARGS: ${{ inputs.signed && '--aab' || '--apk --debug' }}
+          # The sideload build is arm64-only: every modern phone is, and one ABI
+          # keeps the debug APK in the single-digit megabytes.
+          TAURI_ANDROID_ARGS: ${{ inputs.signed && '--aab' || '--apk --debug --target aarch64' }}
         run: npx tauri android build $TAURI_ANDROID_ARGS
 
       - uses: actions/upload-artifact@v4

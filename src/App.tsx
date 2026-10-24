@@ -933,6 +933,9 @@ function App() {
           onNavigate={navigate}
           onAdd={() => openAdd()}
           onToggleTheme={() => setTheme((current) => (current === 'light' ? 'dark' : 'light'))}
+          onExport={exportData}
+          onImport={() => fileInput.current?.click()}
+          onAbout={() => setAboutOpen(true)}
         />
       )}
 

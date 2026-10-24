@@ -4,6 +4,8 @@ import {
   BarChart3,
   Compass,
   CornerDownLeft,
+  Download,
+  Info,
   Layers3,
   LayoutDashboard,
   LibraryBig,
@@ -11,6 +13,7 @@ import {
   Plus,
   Search,
   Sun,
+  Upload,
   X,
 } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
@@ -27,6 +30,9 @@ interface CommandPaletteProps {
   onNavigate: (page: Page) => void;
   onAdd: () => void;
   onToggleTheme: () => void;
+  onExport: () => void;
+  onImport: () => void;
+  onAbout: () => void;
 }
 
 interface PaletteEntry {
@@ -59,6 +65,9 @@ export function CommandPalette({
   onNavigate,
   onAdd,
   onToggleTheme,
+  onExport,
+  onImport,
+  onAbout,
 }: CommandPaletteProps) {
   const panelRef = useFocusTrap<HTMLDivElement>();
   const [query, setQuery] = useState('');
@@ -110,6 +119,36 @@ export function CommandPalette({
         icon: theme === 'light' ? Moon : Sun,
         action: () => {
           onToggleTheme();
+          onClose();
+        },
+      },
+      {
+        key: 'action-export',
+        label: 'Export your library',
+        hint: 'A JSON copy you own',
+        icon: Download,
+        action: () => {
+          onExport();
+          onClose();
+        },
+      },
+      {
+        key: 'action-import',
+        label: 'Import or merge a copy',
+        hint: 'Fold another device in',
+        icon: Upload,
+        action: () => {
+          onImport();
+          onClose();
+        },
+      },
+      {
+        key: 'action-about',
+        label: 'About Loom',
+        hint: 'What this is',
+        icon: Info,
+        action: () => {
+          onAbout();
           onClose();
         },
       },
