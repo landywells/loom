@@ -69,8 +69,9 @@ jobs:
 
       - name: Build
         env:
-          # arm64 covers modern phones, armv7 the older and cheaper ones. Each
-          # comes out as its own APK, so supporting both costs no size.
+          # arm64 covers modern phones, armv7 the older and cheaper ones. Tauri
+          # merges them into one universal APK (~26 MB) so a single file
+          # installs on either — split per-ABI output needs Gradle config.
           TAURI_ANDROID_ARGS: ${{ inputs.signed && '--aab' || '--apk --debug --target aarch64 armv7' }}
         run: npx tauri android build $TAURI_ANDROID_ARGS
 
