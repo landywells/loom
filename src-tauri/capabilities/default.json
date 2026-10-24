@@ -15,7 +15,6 @@
     "core:window:allow-set-focus",
     "core:window:allow-set-fullscreen",
     "core:window:allow-is-fullscreen",
-    "window-state:default",
     "notification:default",
     "opener:default"
   ]

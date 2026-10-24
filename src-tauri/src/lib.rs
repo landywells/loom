@@ -101,26 +101,14 @@ pub fn run() {
                     let _ = window.set_focus();
                 }
             }))
-            .plugin(
-                tauri_plugin_window_state::Builder::default()
-                    // Size is deliberately not restored. The window opens
-                    // maximized, which Windows fits to the work area exactly —
-                    // no remembered geometry, no DPI arithmetic to get wrong.
-                    .with_state_flags(
-                        tauri_plugin_window_state::StateFlags::POSITION
-                            | tauri_plugin_window_state::StateFlags::MAXIMIZED
-                            | tauri_plugin_window_state::StateFlags::FULLSCREEN,
-                    )
-                    .with_filename("loom.window-state.json")
-                    .build(),
-            )
             .setup(|app| {
                 let handle = app.handle().clone();
                 app.set_menu(app_menu::build(&handle)?)?;
 
-                // Explicit: the `maximized` config field is accepted but the
-                // window still arrives at its configured size. Maximizing lets
-                // the OS fit the work area, which no DPI arithmetic can get wrong.
+                // The OS fits a maximized window to the work area exactly, at
+                // any scale factor, which no amount of size arithmetic here can
+                // get right. Geometry is deliberately not remembered: restoring
+                // it was overriding this call.
                 if let Some(window) = app.get_webview_window("main") {
                     let _ = window.maximize();
                 }

@@ -24,7 +24,6 @@ serde_json = "1"
 # These two link against a window, so they cannot exist in the mobile build.
 [target.'cfg(not(any(target_os = "android", target_os = "ios")))'.dependencies]
 tauri-plugin-single-instance = "2"
-tauri-plugin-window-state = "2"
 
 # A debug APK is what you sideload onto your own phone, and debug info is what
 # makes it enormous — strip it and the same build weighs a few megabytes.
