@@ -59,6 +59,8 @@ export interface MediaItem {
   finishedAt?: string;
   minutesSpent?: number;
   discoveryId?: string;
+  /** Wall-clock of the last real change. Only used to decide which copy wins. */
+  updatedAt?: number;
 }
 
 export interface Collection {
@@ -67,6 +69,7 @@ export interface Collection {
   description: string;
   itemIds: string[];
   accent: string;
+  updatedAt?: number;
 }
 
 export type ActivityKind = 'added' | 'progress' | 'finished' | 'rated' | 'favorited' | 'note';

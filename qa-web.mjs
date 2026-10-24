@@ -1,4 +1,7 @@
 import { chromium } from 'playwright';
+import { readFileSync, writeFileSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
 
 const BASE = process.env.QA_BASE || 'http://localhost:5173';
 const PAGES = ['overview', 'library', 'discover', 'collections', 'insights'];
@@ -142,6 +145,46 @@ await page.screenshot({ path: 'qa-insights.png' });
 await page.reload({ waitUntil: 'networkidle' });
 const persisted = await page.evaluate(() => JSON.parse(localStorage.getItem('loom.library.v1')).items.length);
 check('library survives a reload', persisted === after, `${persisted} items`);
+
+// ---------- merge another device's library ----------
+await page.goto(`${BASE}/#/insights`, { waitUntil: 'networkidle' });
+const exported = await Promise.all([
+  page.waitForEvent('download'),
+  page.getByRole('button', { name: /export/i }).click(),
+]);
+const dumpPath = await exported[0].path();
+const mine = JSON.parse(readFileSync(dumpPath, 'utf8'));
+check('export carries per-title timestamps', mine.items.every((item) => Number.isFinite(item.updatedAt)));
+
+const [newer, older] = mine.items;
+newer.title = 'Blade Runner 2099';
+newer.updatedAt = Date.now() + 60_000;
+older.title = 'An edit that arrived too late';
+older.updatedAt = 1;
+mine.items.push({ ...mine.items[2], id: 'phone-only', title: 'Seeded from the phone' });
+const busiest = Object.keys(mine.timeLog)[0];
+mine.timeLog[busiest] = 999;
+const remotePath = join(tmpdir(), 'loom-remote.json');
+writeFileSync(remotePath, JSON.stringify(mine));
+
+await page.setInputFiles('input[type="file"]', remotePath);
+await page.waitForTimeout(900);
+const toast = await page.locator('.toast').last().innerText();
+check('merge counts what it took in', /1 new title/.test(toast) && /1 newer edit/.test(toast), toast.replace(/\s+/g, ' '));
+
+const merged = await page.evaluate(() => JSON.parse(localStorage.getItem('loom.library.v1')));
+const byId = Object.fromEntries(merged.items.map((item) => [item.id, item]));
+check('newer edit wins', byId[newer.id].title === 'Blade Runner 2099', byId[newer.id].title);
+check('older edit is refused', byId[older.id].title !== 'An edit that arrived too late', byId[older.id].title);
+check('a title from the other device arrives', byId['phone-only']?.title === 'Seeded from the phone');
+check('time is reconciled, not added twice', merged.timeLog[busiest] === 999, `${merged.timeLog[busiest]} min`);
+check('nothing was lost', merged.items.length === after + 1, `${after} + 1 → ${merged.items.length}`);
+
+await page.reload({ waitUntil: 'networkidle' });
+const stillMerged = await page.evaluate(
+  () => !!JSON.parse(localStorage.getItem('loom.library.v1')).items.find((item) => item.id === 'phone-only'),
+);
+check('the merge survives a restart', stillMerged);
 
 console.log(`\n${errors.length ? errors.join('\n') : 'no console or page errors'}`);
 console.log(failures ? `\n${failures} check(s) failed` : '\nall checks passed');

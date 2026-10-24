@@ -39,6 +39,7 @@ import { CommandPalette } from './components/CommandPalette';
 import { TitleBar } from './components/TitleBar';
 import { hasWindowChrome, isDesktop, notify, onMenuCommand, setWindowTheme, type MenuCommand } from './lib/desktop';
 import { ShortcutSheet } from './components/ShortcutSheet';
+import { backfillStamps, mergeLibrary, stampRevisions, type Revisions } from './lib/sync';
 
 const DATA_KEY = 'loom.library.v1';
 const THEME_KEY = 'loom.theme.v1';
@@ -61,13 +62,13 @@ function loadData(): AppData {
         // Libraries saved before time tracking existed get a history derived
         // from the titles already in them, so nothing shows up as zero.
         if (!parsed.timeLog) parsed.timeLog = buildTimeLog(parsed.items);
-        return parsed;
+        return backfillStamps(parsed);
       }
     }
   } catch {
     // A corrupted local file should never block the library from opening.
   }
-  return createSeedData();
+  return backfillStamps(createSeedData());
 }
 
 function loadTheme(): Theme {
@@ -117,6 +118,8 @@ function App() {
   const [toasts, setToasts] = useState<Toast[]>([]);
   const toastTimers = useRef<number[]>([]);
   const fileInput = useRef<HTMLInputElement>(null);
+  const [revisions] = useState<Revisions>(() => new Map());
+  const snapshot = useRef<AppData>(data);
 
   const drawerItem = data.items.find((item) => item.id === drawerId) ?? null;
 
@@ -129,12 +132,18 @@ function App() {
   }, [theme]);
 
   useEffect(() => {
+    const stamped: AppData = {
+      ...data,
+      items: stampRevisions(revisions, data.items),
+      collections: stampRevisions(revisions, data.collections),
+    };
+    snapshot.current = stamped;
     try {
-      localStorage.setItem(DATA_KEY, JSON.stringify(data));
+      localStorage.setItem(DATA_KEY, JSON.stringify(stamped));
     } catch {
       // Storage can be unavailable in private browsing. The app still works in memory.
     }
-  }, [data]);
+  }, [data, revisions]);
 
   useEffect(() => {
     const handleHash = () => setPage(pageFromHash());
@@ -702,7 +711,7 @@ function App() {
     const payload = {
       exportedAt: new Date().toISOString(),
       app: 'Loom',
-      ...data,
+      ...snapshot.current,
     };
     const blob = new Blob([JSON.stringify(payload, null, 2)], {
       type: 'application/json',
@@ -723,36 +732,34 @@ function App() {
       const parsed = JSON.parse(await file.text()) as Partial<AppData>;
       if (!Array.isArray(parsed.items)) throw new Error('No items in that file.');
 
-      const incoming = parsed.items.filter(
-        (item): item is MediaItem =>
-          !!item && typeof item.id === 'string' && typeof item.title === 'string',
-      );
-      const knownIds = new Set(data.items.map((item) => item.id));
-      const fresh = incoming.filter((item) => !knownIds.has(item.id));
+      // The file comes from another device, so treat every field as untrusted.
+      const incoming: Partial<AppData> = {
+        ...parsed,
+        items: parsed.items.filter(
+          (item): item is MediaItem =>
+            !!item && typeof item.id === 'string' && typeof item.title === 'string',
+        ),
+        collections: (Array.isArray(parsed.collections) ? parsed.collections : []).filter(
+          (collection): collection is Collection =>
+            !!collection && typeof collection.id === 'string' && typeof collection.name === 'string',
+        ),
+        activities: Array.isArray(parsed.activities) ? parsed.activities : [],
+        timeLog: parsed.timeLog && typeof parsed.timeLog === 'object' ? parsed.timeLog : {},
+      };
 
-      const knownCollections = new Set(data.collections.map((collection) => collection.id));
-      const freshCollections = (Array.isArray(parsed.collections) ? parsed.collections : []).filter(
-        (collection): collection is Collection =>
-          !!collection &&
-          typeof collection.id === 'string' &&
-          typeof collection.name === 'string' &&
-          !knownCollections.has(collection.id),
-      );
-
-      if (!fresh.length && !freshCollections.length) {
-        pushToast('That library is already here, piece for piece.');
+      const { data: merged, report } = mergeLibrary(snapshot.current, incoming, revisions);
+      if (!report.added && !report.updated) {
+        pushToast('Nothing newer in that file — this library is already up to date.');
         return;
       }
 
-      setData((current) => ({
-        ...current,
-        items: [...fresh, ...current.items],
-        collections: [...current.collections, ...freshCollections],
-      }));
+      setData(merged);
       pushToast(
-        `Brought in ${fresh.length} ${fresh.length === 1 ? 'title' : 'titles'}${
-          freshCollections.length ? ` and ${freshCollections.length} shelves` : ''
-        } — nothing was overwritten.`,
+        `Merged ${report.added} new ${report.added === 1 ? 'title' : 'titles'}` +
+          (report.updated
+            ? ` and ${report.updated} newer ${report.updated === 1 ? 'edit' : 'edits'}`
+            : '') +
+          '.',
       );
     } catch (error) {
       pushToast(`Could not read that file. ${(error as Error).message}`);
