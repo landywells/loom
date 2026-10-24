@@ -22,7 +22,8 @@
         "resizable": true,
         "decorations": false,
         "shadow": true,
-        "backgroundColor": "#f2ede3"
+        "backgroundColor": "#f2ede3",
+        "maximized": true
       }
     ],
     "security": {
@@ -31,11 +32,14 @@
   },
   "bundle": {
     "active": true,
-    "targets": ["nsis", "msi"],
+    "targets": [
+      "nsis",
+      "msi"
+    ],
     "category": "Productivity",
     "shortDescription": "A living archive of everything you love",
     "longDescription": "Loom tracks films, series, anime, books, comics, manga, music, videos, games and podcasts in one quiet, beautiful place.",
-    "copyright": "© Alex Rivera",
+    "copyright": "\u00a9 Alex Rivera",
     "icon": [
       "icons/32x32.png",
       "icons/128x128.png",
@@ -49,7 +53,9 @@
       },
       "nsis": {
         "installMode": "currentUser",
-        "languages": ["English"],
+        "languages": [
+          "English"
+        ],
         "displayLanguageSelector": false
       }
     }

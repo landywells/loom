@@ -81,7 +81,7 @@ mod app_menu {
 }
 
 #[cfg(desktop)]
-use tauri::{Emitter, LogicalSize, Manager};
+use tauri::{Emitter, Manager};
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
@@ -103,9 +103,9 @@ pub fn run() {
             }))
             .plugin(
                 tauri_plugin_window_state::Builder::default()
-                    // Size is deliberately not restored: a window remembered
-                    // from a larger monitor lands off this one's screen, and it
-                    // comes back after setup has already run.
+                    // Size is deliberately not restored. The window opens
+                    // maximized, which Windows fits to the work area exactly —
+                    // no remembered geometry, no DPI arithmetic to get wrong.
                     .with_state_flags(
                         tauri_plugin_window_state::StateFlags::POSITION
                             | tauri_plugin_window_state::StateFlags::MAXIMIZED
@@ -118,27 +118,6 @@ pub fn run() {
                 let handle = app.handle().clone();
                 app.set_menu(app_menu::build(&handle)?)?;
 
-                // The configured size does not fit a 1080p screen at 125%
-                // scaling, and the part that hangs off the bottom is exactly
-                // where the drawer's Edit button lives. Clamp in logical units:
-                // physical pixels get re-rounded and the window ends up taller.
-                if let Some(window) = app.get_webview_window("main") {
-                    if let Ok(Some(monitor)) = window.current_monitor() {
-                        let scale = monitor.scale_factor();
-                        let work = monitor.work_area().size.to_logical::<f64>(scale);
-                        let inner = window
-                            .inner_size()
-                            .map(|size| size.to_logical::<f64>(scale))
-                            .unwrap_or(work);
-                        if inner.width > work.width || inner.height > work.height {
-                            let _ = window.set_size(LogicalSize::new(
-                                inner.width.min(work.width),
-                                inner.height.min(work.height),
-                            ));
-                            let _ = window.center();
-                        }
-                    }
-                }
                 Ok(())
             })
             .on_menu_event(|app_handle, event| {
