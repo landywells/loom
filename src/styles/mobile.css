@@ -1,0 +1,1536 @@
+/* ==========================================================================
+   Phone-first layer. Loaded last so it wins over the desktop sheet.
+   Targets: readable type, 44px+ targets, no iOS focus-zoom, bottom sheets.
+   ========================================================================== */
+
+@media (max-width: 760px) {
+  :root {
+    --page-x: 16px;
+    --radius: 18px;
+  }
+
+  html {
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    font-size: 16px;
+    line-height: 1.55;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  /* 16px inputs stop Safari zooming the page on focus */
+  input,
+  select,
+  textarea {
+    font-size: 16px;
+  }
+
+  .page {
+    padding-bottom: 28px;
+  }
+
+  /* ---------- Type that was tuned for a mouse, not a phone ---------- */
+
+  .eyebrow,
+  .tiny-label {
+    font-size: 10.5px;
+    letter-spacing: 0.11em;
+  }
+
+  .field-label,
+  .field > span,
+  .studio-label,
+  .popover-kicker,
+  .appearance-label {
+    font-size: 10px;
+  }
+
+  .field > span small {
+    font-size: 10px;
+  }
+
+  .unrated,
+  .rating-value {
+    font-size: 9.5px;
+  }
+
+  kbd {
+    font-size: 10px;
+  }
+
+  /* ---------- Buttons & controls ---------- */
+
+  .button-primary,
+  .button-secondary,
+  .button-ghost,
+  .button-accent {
+    height: 46px;
+    padding: 0 18px;
+    font-size: 13.5px;
+    border-radius: 11px;
+  }
+
+  .icon-button,
+  .top-actions .avatar-md {
+    width: 44px;
+    height: 44px;
+  }
+
+  .quiet-icon-button {
+    width: 38px;
+    height: 38px;
+  }
+
+  .text-link {
+    gap: 7px;
+    padding: 8px 2px;
+    font-size: 13px;
+  }
+
+  .favorite-button {
+    width: 34px;
+    height: 34px;
+    opacity: 1;
+    transform: none;
+  }
+
+  .status-tabs button {
+    height: 36px;
+    padding: 0 12px;
+    font-size: 12px;
+    border-radius: 9px;
+  }
+
+  .status-tabs button > span {
+    min-width: 20px;
+    height: 18px;
+    font-size: 9.5px;
+  }
+
+  .type-chip {
+    height: 34px;
+    padding: 0 11px;
+    font-size: 11.5px;
+  }
+
+  .type-chip > span {
+    font-size: 9.5px;
+  }
+
+  .sort-control {
+    height: 44px;
+    padding: 0 12px;
+  }
+
+  .sort-control select {
+    font-size: 12px;
+  }
+
+  .view-toggle {
+    padding: 4px;
+  }
+
+  .view-toggle button {
+    width: 42px;
+    height: 36px;
+  }
+
+  .clear-filters {
+    height: 34px;
+    padding: 0 10px;
+    font-size: 11px;
+  }
+
+  .library-search {
+    height: 46px;
+  }
+
+  .library-search input {
+    font-size: 15px;
+  }
+
+  /* ---------- Topbar ---------- */
+
+  .topbar {
+    height: 62px;
+    gap: 8px;
+  }
+
+  .mini-brand {
+    font-size: 26px;
+  }
+
+  .search-trigger {
+    width: 44px;
+    height: 44px;
+    flex: 0 0 44px;
+  }
+
+  .top-actions {
+    gap: 4px;
+  }
+
+  .popover {
+    position: fixed;
+    top: 62px;
+    right: 10px;
+    left: 10px;
+    width: auto;
+    max-width: 420px;
+    margin-left: auto;
+  }
+
+  .notification-row {
+    padding: 12px 10px;
+  }
+
+  .notification-copy strong {
+    font-size: 14px;
+  }
+
+  .notification-copy > span {
+    font-size: 12.5px;
+  }
+
+  .notification-copy small,
+  .popover-footer {
+    font-size: 11.5px;
+  }
+
+  .popover-footer {
+    padding: 15px 18px;
+  }
+
+  /* ---------- Dashboard ---------- */
+
+  .dashboard-page .page-intro {
+    padding-top: 22px;
+    padding-bottom: 22px;
+  }
+
+  .page-intro h1,
+  .dashboard-page .page-intro h1 {
+    font-size: clamp(40px, 11vw, 52px);
+  }
+
+  .page-intro-copy > p {
+    font-size: 14.5px;
+  }
+
+  .now-card {
+    padding: 22px 18px 20px;
+    border-radius: 22px;
+  }
+
+  .now-copy h2 {
+    font-size: clamp(34px, 9.6vw, 46px);
+  }
+
+  .now-meta {
+    font-size: 11.5px;
+  }
+
+  .now-progress-top {
+    font-size: 11px;
+  }
+
+  .now-remaining {
+    font-size: 10.5px;
+  }
+
+  .now-actions {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 46px;
+    flex-wrap: nowrap;
+    gap: 9px;
+  }
+
+  .now-actions .button-accent {
+    height: 46px;
+    padding: 0 14px;
+    font-size: 13px;
+  }
+
+  .round-heart {
+    width: 46px;
+    height: 46px;
+  }
+
+  /* Keep the ritual line readable instead of ellipsising a title to "in …" */
+  .ritual-copy p {
+    display: -webkit-box;
+    overflow: hidden;
+    white-space: normal;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+  }
+
+  .type-picker-grid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 7px;
+  }
+
+  .type-picker-grid button {
+    height: 56px;
+    padding: 10px;
+    font-size: 11px;
+    border-radius: 10px;
+  }
+
+  .heatmap-hint {
+    display: block;
+  }
+
+  .hero-aside {
+    gap: 12px;
+  }
+
+  .side-card {
+    padding: 18px;
+    border-radius: 20px;
+  }
+
+  .ritual-body {
+    gap: 16px;
+  }
+
+  .reading-ring {
+    flex-basis: 92px;
+    width: 92px;
+    height: 92px;
+  }
+
+  .reading-ring-inner strong {
+    font-size: 32px;
+  }
+
+  .reading-ring-inner span {
+    font-size: 9px;
+  }
+
+  .ritual-copy h3 {
+    font-size: 22px;
+  }
+
+  .ritual-copy p {
+    font-size: 12px;
+  }
+
+  .ritual-footer {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 10px;
+    padding-top: 12px;
+  }
+
+  .ritual-footer > span {
+    font-size: 10.5px;
+    white-space: normal;
+  }
+
+  .ritual-footer button {
+    height: 38px;
+    padding: 0 13px;
+    font-size: 11.5px;
+    border-radius: 9px;
+  }
+
+  .player-main {
+    gap: 12px;
+  }
+
+  .mini-record {
+    flex-basis: 54px;
+    width: 54px;
+    height: 54px;
+  }
+
+  .record-sleeve {
+    width: 47px;
+    height: 47px;
+  }
+
+  .record-disc {
+    width: 47px;
+    height: 47px;
+  }
+
+  .player-track h3 {
+    font-size: 18px;
+  }
+
+  .player-track p {
+    font-size: 11px;
+  }
+
+  .player-play {
+    width: 40px;
+    height: 40px;
+  }
+
+  .player-play svg {
+    width: 17px;
+    height: 17px;
+  }
+
+  .player-controls button {
+    width: 38px;
+    height: 38px;
+  }
+
+  .player-controls > span,
+  .player-times span {
+    font-size: 10px;
+  }
+
+  .stats-strip {
+    border-radius: 18px;
+  }
+
+  .stat-cell {
+    padding: 15px 14px 14px;
+  }
+
+  .stat-bottom > span {
+    font-size: 12px;
+  }
+
+  .stat-icon {
+    width: 30px;
+    height: 30px;
+  }
+
+  .section-heading h2 {
+    font-size: 28px;
+  }
+
+  .section-heading-side {
+    font-size: 10.5px;
+  }
+
+  .week-heading h2,
+  .queue-heading h2 {
+    font-size: 25px;
+  }
+
+  .trend-chip {
+    height: 30px;
+    font-size: 10.5px;
+  }
+
+  .trend-chip small {
+    font-size: 10.5px;
+  }
+
+  .week-summary strong {
+    font-size: 38px;
+  }
+
+  .week-summary span {
+    font-size: 11.5px;
+  }
+
+  .week-bar-track {
+    height: 96px;
+  }
+
+  .week-bar small {
+    font-size: 9.5px;
+  }
+
+  .week-foot > span {
+    font-size: 11.5px;
+  }
+
+  .week-foot .text-link {
+    font-size: 12px;
+  }
+
+  .queue-row {
+    gap: 12px;
+    padding: 13px 0;
+  }
+
+  .queue-cover {
+    width: 44px;
+    flex-basis: 44px;
+    height: 58px;
+  }
+
+  .queue-type {
+    font-size: 9.5px;
+  }
+
+  .queue-copy strong {
+    font-size: 13.5px;
+  }
+
+  .queue-copy small {
+    font-size: 10.5px;
+  }
+
+  .queue-arrow {
+    width: 34px;
+    height: 34px;
+  }
+
+  .queue-footer {
+    padding-top: 14px;
+    font-size: 12px;
+  }
+
+  /* ---------- Media cards ---------- */
+
+  .media-card-meta {
+    font-size: 9.5px;
+  }
+
+  .media-card-title {
+    font-size: 14px;
+  }
+
+  .media-card-creator {
+    font-size: 11.5px;
+  }
+
+  .card-progress-labels {
+    font-size: 9.5px;
+  }
+
+  .library-grid {
+    gap: 24px 14px;
+  }
+
+  /* ---------- Library ---------- */
+
+  .library-controls {
+    padding: 12px;
+    border-radius: 18px;
+  }
+
+  .library-results-bar {
+    font-size: 10.5px;
+  }
+
+  .empty-state {
+    padding: 32px 20px;
+  }
+
+  .empty-state h2 {
+    font-size: 24px;
+  }
+
+  .empty-state p {
+    font-size: 13px;
+  }
+
+  /* ---------- Discover ---------- */
+
+  .discover-intro .page-intro-copy > p {
+    font-size: 14px;
+  }
+
+  .feature-panel {
+    padding: 26px 20px;
+    border-radius: 22px;
+  }
+
+  .feature-kicker {
+    font-size: 10.5px;
+  }
+
+  .feature-copy h2 {
+    font-size: clamp(44px, 13vw, 60px);
+  }
+
+  .feature-byline {
+    font-size: 11.5px;
+  }
+
+  .feature-blurb {
+    font-size: 13.5px;
+    line-height: 1.6;
+  }
+
+  .feature-rating,
+  .feature-meta .soft-chip {
+    height: 30px;
+    font-size: 10.5px;
+  }
+
+  .feature-cta {
+    height: 46px;
+    padding: 0 18px;
+    font-size: 13.5px;
+  }
+
+  .discover-filters {
+    gap: 7px;
+    margin-bottom: 18px;
+  }
+
+  .discover-card {
+    grid-template-columns: 116px minmax(0, 1fr);
+    min-height: 200px;
+    border-radius: 17px;
+  }
+
+  .discover-meta {
+    font-size: 9.5px;
+  }
+
+  .discover-copy h3 {
+    font-size: 21px;
+  }
+
+  .discover-creator {
+    font-size: 11px;
+  }
+
+  .discover-blurb {
+    display: block;
+    font-size: 11.5px;
+    line-height: 1.5;
+  }
+
+  .discover-tags {
+    display: flex;
+  }
+
+  .discover-tags span {
+    font-size: 9px;
+  }
+
+  .discover-card-foot {
+    justify-content: space-between;
+    padding-top: 10px;
+  }
+
+  .discover-card-foot > span {
+    display: block;
+    font-size: 10.5px;
+  }
+
+  .save-button {
+    height: 36px;
+    padding: 0 12px;
+    font-size: 11px;
+    border-radius: 9px;
+  }
+
+  .discover-closer p {
+    font-size: 21px;
+  }
+
+  .closer-credit {
+    font-size: 10px;
+  }
+
+  /* ---------- Collections ---------- */
+
+  .collections-note p {
+    font-size: 18px;
+  }
+
+  .collections-note-index {
+    font-size: 9.5px;
+  }
+
+  .collection-card,
+  .new-collection-card {
+    min-height: 0;
+    padding: 18px;
+    border-radius: 20px;
+  }
+
+  .collection-card-top span {
+    font-size: 9.5px;
+  }
+
+  .collection-collage {
+    height: 116px;
+  }
+
+  .collage-0 {
+    width: 62px;
+    height: 84px;
+  }
+
+  .collage-1 {
+    width: 74px;
+    height: 100px;
+  }
+
+  .collage-2 {
+    width: 62px;
+    height: 84px;
+  }
+
+  .collection-card-copy h2 {
+    font-size: 26px;
+  }
+
+  .collection-card-copy p {
+    font-size: 12px;
+  }
+
+  .collection-card-foot {
+    font-size: 9.5px;
+  }
+
+  .new-collection-card h2 {
+    font-size: 24px;
+  }
+
+  .new-collection-card p {
+    font-size: 12.5px;
+  }
+
+  .new-collection-plus {
+    width: 46px;
+    height: 46px;
+  }
+
+  .new-collection-link {
+    font-size: 10.5px;
+  }
+
+  .back-link {
+    padding: 10px 0;
+    font-size: 13px;
+  }
+
+  .collection-detail-copy h1 {
+    font-size: clamp(38px, 11vw, 52px);
+  }
+
+  .collection-detail-copy p {
+    font-size: 13px;
+  }
+
+  .collection-detail-meta {
+    font-size: 10px;
+  }
+
+  .quiet-collection-delete {
+    font-size: 10px;
+  }
+
+  .inline-confirm {
+    font-size: 11.5px;
+  }
+
+  .inline-confirm button {
+    font-size: 11.5px;
+  }
+
+  /* ---------- Insights ---------- */
+
+  .insight-ledger article {
+    padding: 16px 14px;
+  }
+
+  .ledger-label {
+    font-size: 9.5px;
+  }
+
+  .insight-ledger p {
+    font-size: 11.5px;
+    white-space: normal;
+  }
+
+  .ledger-mark {
+    font-size: 9.5px;
+  }
+
+  .heatmap-heading h2 {
+    font-size: 24px;
+  }
+
+  .heatmap-summary > div:first-child span {
+    font-size: 11.5px;
+  }
+
+  .heatmap-caption {
+    font-size: 12.5px;
+  }
+
+  .panel-heading h2 {
+    font-size: 21px;
+  }
+
+  .format-row {
+    min-height: 26px;
+    font-size: 11.5px;
+  }
+
+  .format-row strong {
+    font-size: 10.5px;
+  }
+
+  .ratings-average > div > span {
+    font-size: 10.5px;
+  }
+
+  .rating-bar-label {
+    font-size: 10.5px;
+  }
+
+  .rating-bar-count {
+    font-size: 10px;
+  }
+
+  .activity-row {
+    padding: 11px 0;
+  }
+
+  .activity-dot {
+    width: 30px;
+    height: 30px;
+  }
+
+  .activity-copy strong {
+    font-size: 12px;
+  }
+
+  .activity-copy small {
+    font-size: 10.5px;
+  }
+
+  .activity-time {
+    font-size: 9.5px;
+  }
+
+  .year-callout {
+    padding: 22px 18px;
+  }
+
+  .year-callout-copy h2 {
+    font-size: 24px;
+  }
+
+  .year-callout-copy p {
+    font-size: 12px;
+  }
+
+  /* ---------- Bottom sheets: drawer ---------- */
+
+  .drawer-backdrop {
+    align-items: flex-end;
+    padding: 0;
+  }
+
+  .item-drawer {
+    position: relative;
+    width: 100%;
+    height: 93dvh;
+    border: 0;
+    border-top: 1px solid var(--line);
+    border-radius: 22px 22px 0 0;
+    box-shadow: 0 -18px 50px rgba(0, 0, 0, 0.28);
+    animation: sheet-up 0.34s var(--ease) both;
+  }
+
+  @keyframes sheet-up {
+    from {
+      transform: translateY(6%);
+      opacity: 0.6;
+    }
+    to {
+      transform: translateY(0);
+      opacity: 1;
+    }
+  }
+
+  .item-drawer::before {
+    content: '';
+    position: absolute;
+    top: 7px;
+    left: 50%;
+    width: 40px;
+    height: 4px;
+    border-radius: 4px;
+    background: var(--line-strong);
+    transform: translateX(-50%);
+    z-index: 3;
+  }
+
+  .drawer-topbar {
+    height: 50px;
+    padding: 6px 12px 0 18px;
+  }
+
+  .drawer-index {
+    font-size: 10px;
+  }
+
+  .drawer-hero {
+    gap: 16px;
+    padding: 14px 18px 18px;
+  }
+
+  .drawer-cover {
+    width: 108px;
+    flex-basis: 108px;
+  }
+
+  .drawer-headline h1 {
+    font-size: 27px;
+  }
+
+  .drawer-creator {
+    font-size: 12px;
+  }
+
+  .drawer-rating > span {
+    font-size: 11px;
+  }
+
+  .drawer-favorite {
+    height: 38px;
+    padding: 0 12px;
+    font-size: 12px;
+    border-radius: 9px;
+  }
+
+  .drawer-content {
+    padding: 18px;
+  }
+
+  .drawer-blurb {
+    font-size: 15.5px;
+  }
+
+  .drawer-section-heading {
+    font-size: 10px;
+  }
+
+  .drawer-section-heading button {
+    font-size: 12px;
+  }
+
+  .drawer-progress-card {
+    padding: 16px;
+  }
+
+  .drawer-progress-info strong {
+    font-size: 12.5px;
+  }
+
+  .drawer-progress-info > div > span {
+    font-size: 11.5px;
+  }
+
+  .drawer-percent {
+    font-size: 30px;
+  }
+
+  .drawer-progress-controls > button {
+    height: 42px;
+    padding: 0 14px;
+    font-size: 13px;
+    border-radius: 9px;
+  }
+
+  .drawer-progress-controls > button small {
+    font-size: 10.5px;
+  }
+
+  .drawer-progress-controls > span {
+    font-size: 13px;
+  }
+
+  .drawer-progress-controls > span small {
+    font-size: 11.5px;
+  }
+
+  .drawer-statuses {
+    gap: 7px;
+  }
+
+  .drawer-statuses button {
+    height: 40px;
+    padding: 0 13px;
+    font-size: 12px;
+    border-radius: 9px;
+  }
+
+  .drawer-tags span {
+    font-size: 10px;
+  }
+
+  .drawer-collection {
+    height: 44px;
+    font-size: 13px;
+    border-radius: 10px;
+  }
+
+  .drawer-collection-state {
+    font-size: 9.5px;
+  }
+
+  .collection-member-remove {
+    height: 34px;
+    font-size: 9.5px;
+  }
+
+  .collection-heading-side {
+    gap: 4px;
+  }
+
+  .quiet-collection-edit {
+    font-size: 9.5px;
+  }
+
+  .drawer-notes textarea {
+    font-size: 15px;
+    min-height: 92px;
+  }
+
+  .drawer-meta-grid > div > span {
+    font-size: 11px;
+  }
+
+  .drawer-meta-grid small {
+    font-size: 10px;
+  }
+
+  .drawer-history-row {
+    padding: 9px 0;
+    font-size: 12px;
+  }
+
+  .drawer-history-row > small {
+    font-size: 10.5px;
+  }
+
+  .drawer-footer {
+    padding: 12px 16px calc(12px + env(safe-area-inset-bottom, 0px));
+  }
+
+  .drawer-delete {
+    width: 46px;
+    height: 46px;
+  }
+
+  .drawer-edit {
+    height: 46px;
+    font-size: 13.5px;
+  }
+
+  .drawer-confirm {
+    flex-wrap: wrap;
+    padding: 14px 16px calc(14px + env(safe-area-inset-bottom, 0px));
+  }
+
+  .drawer-confirm > span {
+    font-size: 12.5px;
+  }
+
+  .drawer-confirm button {
+    height: 38px;
+    padding: 0 14px;
+    font-size: 12px;
+  }
+
+  /* ---------- Bottom sheets: modals ---------- */
+
+  .modal-backdrop {
+    align-items: flex-end;
+    padding: 0;
+  }
+
+  .modal-panel {
+    width: 100%;
+    max-height: 94dvh;
+    border: 0;
+    border-top: 1px solid var(--line);
+    border-radius: 20px 20px 0 0;
+    box-shadow: 0 -18px 50px rgba(0, 0, 0, 0.3);
+    animation: sheet-up 0.32s var(--ease) both;
+  }
+
+  .modal-head {
+    padding: 18px 18px 14px;
+  }
+
+  .modal-head h2 {
+    font-size: 27px;
+  }
+
+  .modal-foot {
+    padding: 12px 18px calc(12px + env(safe-area-inset-bottom, 0px));
+  }
+
+  .item-form-body {
+    grid-template-columns: 1fr;
+  }
+
+  .form-main {
+    gap: 18px;
+    padding: 18px;
+  }
+
+  .type-picker-grid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 7px;
+  }
+
+  .type-picker-grid button {
+    height: 56px;
+    padding: 10px;
+    font-size: 11px;
+    border-radius: 10px;
+  }
+
+  .field input,
+  .field textarea {
+    height: 46px;
+    font-size: 15px;
+    border-radius: 10px;
+  }
+
+  .field textarea {
+    padding: 12px;
+  }
+
+  .field-error {
+    font-size: 11.5px;
+  }
+
+  .status-picker {
+    gap: 7px;
+  }
+
+  .status-picker button {
+    height: 40px;
+    padding: 0 13px;
+    font-size: 12px;
+    border-radius: 9px;
+  }
+
+  .progress-fields {
+    padding: 14px;
+  }
+
+  .rating-input {
+    gap: 10px;
+    font-size: 11.5px;
+  }
+
+  .clear-rating {
+    font-size: 12px;
+  }
+
+  .favorite-toggle {
+    height: 44px;
+    padding: 0 14px;
+    font-size: 12.5px;
+    border-radius: 10px;
+  }
+
+  .lookup-toggle {
+    padding: 13px 12px;
+  }
+
+  .lookup-toggle-copy strong {
+    font-size: 13px;
+  }
+
+  .lookup-toggle-copy small {
+    font-size: 11px;
+    white-space: normal;
+  }
+
+  .lookup-search {
+    height: 46px;
+  }
+
+  .lookup-search input {
+    font-size: 15px;
+  }
+
+  .lookup-results {
+    max-height: 268px;
+  }
+
+  .lookup-row {
+    padding: 10px 6px;
+  }
+
+  .lookup-thumb {
+    flex-basis: 42px;
+    width: 42px;
+    height: 56px;
+  }
+
+  .lookup-copy strong {
+    font-size: 13px;
+  }
+
+  .lookup-copy small {
+    font-size: 11px;
+  }
+
+  .lookup-meta {
+    font-size: 9.5px;
+  }
+
+  .lookup-error,
+  .lookup-note {
+    font-size: 12px;
+  }
+
+  .lookup-link-row input {
+    height: 46px;
+    font-size: 15px;
+  }
+
+  .cover-studio {
+    display: grid;
+    grid-template-columns: 148px minmax(0, 1fr);
+    gap: 14px;
+    padding: 18px;
+    border-left: 0;
+    border-top: 1px solid var(--line);
+  }
+
+  .cover-studio-head,
+  .studio-note {
+    grid-column: 1 / -1;
+  }
+
+  .cover-preview {
+    grid-row: span 3;
+    height: 224px;
+  }
+
+  .form-cover {
+    width: 122px;
+  }
+
+  .studio-label {
+    font-size: 10px;
+  }
+
+  .palette-options button {
+    width: 34px;
+    height: 34px;
+  }
+
+  .pattern-options button {
+    height: 36px;
+    font-size: 10.5px;
+  }
+
+  .cover-mode button {
+    height: 26px;
+    padding: 0 10px;
+    font-size: 10px;
+  }
+
+  .artwork-note {
+    height: 38px;
+    font-size: 11.5px;
+  }
+
+  .studio-note p {
+    font-size: 11.5px;
+  }
+
+  .item-form-foot {
+    padding: 12px 18px calc(12px + env(safe-area-inset-bottom, 0px));
+  }
+
+  .collection-form-body {
+    gap: 18px;
+    padding: 18px;
+  }
+
+  .picker-head {
+    font-size: 10px;
+  }
+
+  .picker-head span:last-child {
+    font-size: 10px;
+  }
+
+  .picker-search {
+    height: 42px;
+  }
+
+  .picker-search input {
+    font-size: 15px;
+  }
+
+  .picker-row {
+    padding: 10px 6px;
+  }
+
+  .picker-cover {
+    flex-basis: 34px;
+    width: 34px;
+    height: 45px;
+  }
+
+  .picker-copy strong {
+    font-size: 12.5px;
+  }
+
+  .picker-copy small {
+    font-size: 10.5px;
+  }
+
+  .picker-check {
+    width: 28px;
+    height: 28px;
+  }
+
+  .picker-list {
+    max-height: 300px;
+  }
+
+  .collection-preview strong {
+    font-size: 26px;
+  }
+
+  /* ---------- Command palette ---------- */
+
+  .palette-backdrop {
+    padding: 0 10px 10px;
+    align-items: flex-end;
+  }
+
+  .palette-panel {
+    width: 100%;
+    border-radius: 20px;
+    animation: sheet-up 0.3s var(--ease) both;
+  }
+
+  .palette-input-row {
+    height: 58px;
+  }
+
+  .palette-input-row input {
+    font-size: 16px;
+  }
+
+  .palette-body {
+    max-height: 56dvh;
+  }
+
+  .palette-section-label {
+    font-size: 9.5px;
+  }
+
+  .palette-entry {
+    min-height: 52px;
+    padding: 8px;
+  }
+
+  .palette-entry-copy strong {
+    font-size: 14px;
+  }
+
+  .palette-entry-copy small {
+    font-size: 11.5px;
+  }
+
+  .palette-cover {
+    flex-basis: 34px;
+    width: 34px;
+    height: 45px;
+  }
+
+  .palette-item-type {
+    font-size: 10px;
+  }
+
+  .palette-foot {
+    height: 44px;
+    font-size: 11px;
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+
+  .palette-foot kbd {
+    width: 20px;
+    height: 20px;
+    font-size: 10px;
+  }
+
+  /* ---------- Tab bar ---------- */
+
+  .mobile-tabbar {
+    right: 8px;
+    bottom: calc(8px + env(safe-area-inset-bottom, 0px));
+    left: 8px;
+    height: 64px;
+    padding: 5px 6px;
+    border-radius: 19px;
+  }
+
+  .mobile-tabbar button {
+    gap: 3px;
+    font-size: 9px;
+  }
+
+  .mobile-tabbar .mobile-add {
+    width: 46px;
+    height: 46px;
+    transform: translateY(-11px);
+  }
+
+  .site-footer {
+    padding: 20px 2px calc(96px + env(safe-area-inset-bottom, 0px));
+  }
+
+  .footer-actions {
+    gap: 14px;
+  }
+
+  .shortcut-list li {
+    grid-template-columns: 92px 1fr;
+    gap: 10px;
+    padding: 13px 0;
+    font-size: 13.5px;
+  }
+
+  .shortcut-keys kbd {
+    min-width: 30px;
+    height: 28px;
+    font-size: 11.5px;
+  }
+
+  .shortcut-foot {
+    font-size: 13px;
+  }
+
+  .site-footer p {
+    font-size: 12px;
+  }
+
+  .footer-shortcut {
+    gap: 7px;
+    font-size: 10.5px;
+  }
+
+  .footer-brand {
+    font-size: 21px;
+  }
+
+  /* ---------- Toasts ---------- */
+
+  .toast-stack {
+    right: 10px;
+    bottom: calc(84px + env(safe-area-inset-bottom, 0px));
+    left: 10px;
+    align-items: stretch;
+  }
+
+  .toast {
+    max-width: none;
+    padding: 13px 14px;
+    font-size: 13.5px;
+    border-radius: 14px;
+  }
+
+  .toast button {
+    width: 32px;
+    height: 32px;
+  }
+}
+
+/* Small phones: keep the editorial rhythm without crushing it. */
+@media (max-width: 430px) {
+  .now-copy h2,
+  .feature-copy h2,
+  .collection-detail-copy h1 {
+    letter-spacing: -0.025em;
+  }
+
+  .stats-strip {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .orbit-rail {
+    grid-auto-columns: 62%;
+  }
+
+  .discover-card {
+    grid-template-columns: 96px minmax(0, 1fr);
+  }
+
+  .discover-copy h3 {
+    font-size: 19px;
+  }
+
+  .cover-studio {
+    grid-template-columns: 1fr;
+  }
+
+  .cover-preview {
+    grid-row: auto;
+    height: 230px;
+  }
+
+  .form-cover {
+    width: 132px;
+  }
+
+  .drawer-hero {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .drawer-cover {
+    width: 88px;
+    flex-basis: 88px;
+  }
+
+  .drawer-headline {
+    width: 100%;
+  }
+}
+
+/* Landscape phones get the sheet heights back. */
+@media (max-height: 560px) and (max-width: 900px) {
+  .item-drawer,
+  .modal-panel {
+    height: 96dvh;
+    max-height: 96dvh;
+  }
+}
+
+/* Very small handsets */
+@media (max-width: 360px) {
+  .type-picker-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .library-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 20px 10px;
+  }
+
+  .status-tabs button {
+    padding: 0 9px;
+  }
+}
+
+/* Header action rows hold two buttons; let them share the line on phones. */
+@media (max-width: 760px) {
+  .intro-actions {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .intro-actions .button-secondary,
+  .intro-actions .button-primary {
+    flex: 1 1 auto;
+    min-width: 0;
+    justify-content: center;
+    padding: 0 12px;
+    white-space: nowrap;
+  }
+}

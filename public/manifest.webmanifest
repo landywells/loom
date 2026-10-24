@@ -1,0 +1,26 @@
+{
+  "name": "Loom — everything you love, in one thread",
+  "short_name": "Loom",
+  "description": "A quiet, beautiful tracker for films, books, comics, music, videos, games, podcasts and everything else you consume.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#f2ede3",
+  "theme_color": "#f2ede3",
+  "categories": ["lifestyle", "entertainment", "productivity"],
+  "icons": [
+    {
+      "src": "./icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "./icon-maskable.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "maskable"
+    }
+  ]
+}

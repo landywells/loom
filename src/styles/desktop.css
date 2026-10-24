@@ -1,0 +1,273 @@
+/* ==================================================
+   Desktop shell — window chrome that belongs to the app
+   Only active inside Tauri (html.is-desktop), never in the browser build.
+   ================================================== */
+
+html.is-desktop {
+  --titlebar-h: 40px;
+}
+
+/* ---------- the bar ---------- */
+
+.titlebar {
+  position: fixed;
+  inset: 0 0 auto;
+  z-index: 400;
+  display: flex;
+  align-items: stretch;
+  height: var(--titlebar-h);
+  background: color-mix(in srgb, var(--bg) 90%, var(--surface));
+  border-bottom: 1px solid var(--line);
+  user-select: none;
+}
+
+/* brand block occupies the sidebar's column so the two line up */
+.titlebar-brand {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  width: var(--sidebar-width);
+  padding-left: 22px;
+  border-right: 1px solid var(--line);
+  background: color-mix(in srgb, var(--bg) 82%, var(--surface));
+}
+
+.titlebar-drag {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  min-width: 0;
+  padding: 0 20px;
+}
+
+/* children must not swallow the drag events the parent listens for */
+.titlebar-brand > *,
+.titlebar-caption {
+  pointer-events: none;
+}
+
+.titlebar-mark {
+  color: var(--accent);
+  font-size: 13px;
+  line-height: 1;
+}
+
+.titlebar-name {
+  color: var(--ink);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+}
+
+.titlebar-caption {
+  overflow: hidden;
+  color: var(--faint);
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  letter-spacing: 0.11em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.titlebar-controls {
+  display: flex;
+  margin-left: auto;
+}
+
+.titlebar-button {
+  display: grid;
+  place-items: center;
+  width: 45px;
+  padding: 0;
+  border: 0;
+  border-left: 1px solid transparent;
+  background: transparent;
+  color: var(--muted);
+  transition:
+    background 0.14s ease,
+    color 0.14s ease,
+    border-color 0.14s ease;
+}
+
+.titlebar-button:hover {
+  background: var(--surface-2);
+  color: var(--ink);
+}
+
+.titlebar-button:active {
+  background: var(--surface-3);
+}
+
+.titlebar-button:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: -3px;
+}
+
+.titlebar-close:hover {
+  border-left-color: #c8321f;
+  background: #c8321f;
+  color: #fff;
+}
+
+/* ---------- give the bar its own slice of the viewport ---------- */
+
+html.is-desktop body {
+  padding-top: var(--titlebar-h);
+}
+
+html.is-desktop .sidebar {
+  top: var(--titlebar-h);
+}
+
+html.is-desktop .main-shell {
+  min-height: calc(100vh - var(--titlebar-h));
+}
+
+html.is-desktop .topbar {
+  top: var(--titlebar-h);
+}
+
+/* overlays belong to the client area, so they start under the chrome */
+html.is-desktop .drawer-backdrop,
+html.is-desktop .modal-backdrop,
+html.is-desktop .palette-backdrop {
+  inset: var(--titlebar-h) 0 0;
+}
+
+html.is-desktop .modal-panel {
+  max-height: calc(100vh - var(--titlebar-h) - 44px);
+}
+
+/* ---------- feel of a native window ---------- */
+
+/* WebView2's default scrollbar is a wide grey gutter; make it part of the paper */
+html.is-desktop {
+  scrollbar-width: thin;
+  scrollbar-color: var(--surface-3) transparent;
+}
+
+html.is-desktop * {
+  scrollbar-width: thin;
+  scrollbar-color: var(--surface-3) transparent;
+}
+
+html.is-desktop ::-webkit-scrollbar {
+  width: 11px;
+  height: 11px;
+}
+
+html.is-desktop ::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+html.is-desktop ::-webkit-scrollbar-thumb {
+  border: 3px solid transparent;
+  border-radius: 99px;
+  background: var(--line-strong);
+  background-clip: padding-box;
+}
+
+html.is-desktop ::-webkit-scrollbar-thumb:hover {
+  background: var(--faint);
+  background-clip: padding-box;
+}
+
+html.is-desktop ::-webkit-scrollbar-corner {
+  background: transparent;
+}
+
+/* dragging a cover out of the window is never intended */
+html.is-desktop img {
+  -webkit-user-drag: none;
+  user-select: none;
+}
+
+/* ---------- about card ---------- */
+
+.about-card {
+  gap: 4px;
+  width: min(460px, 100%);
+  padding: 30px 30px 22px;
+  text-align: left;
+}
+
+.about-mark {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  margin-bottom: 16px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: var(--surface);
+  color: var(--accent);
+  font-size: 19px;
+}
+
+.about-card h2 {
+  margin: 0;
+  font-family: var(--font-serif);
+  font-size: 31px;
+  font-weight: 400;
+  letter-spacing: -0.015em;
+  line-height: 1.05;
+}
+
+.about-tagline {
+  margin: 5px 0 0;
+  color: var(--accent);
+  font-family: var(--font-serif);
+  font-size: 16px;
+  font-style: italic;
+}
+
+.about-copy {
+  margin: 15px 0 0;
+  color: var(--ink-soft);
+  font-size: 13.5px;
+  line-height: 1.65;
+}
+
+.about-facts {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1px;
+  margin: 20px 0 0;
+  padding: 0;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 13px;
+  background: var(--line);
+}
+
+.about-facts div {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 11px 14px;
+  background: var(--surface);
+}
+
+.about-facts dt {
+  color: var(--faint);
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.about-facts dd {
+  margin: 0;
+  color: var(--ink);
+  font-size: 12.5px;
+  font-weight: 500;
+}
+
+.about-card .modal-foot {
+  padding: 20px 0 0;
+  border-top: 0;
+}
