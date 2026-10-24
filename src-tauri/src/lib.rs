@@ -81,7 +81,7 @@ mod app_menu {
 }
 
 #[cfg(desktop)]
-use tauri::{Emitter, Manager};
+use tauri::{Emitter, Manager, PhysicalSize};
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
@@ -109,6 +109,23 @@ pub fn run() {
             .setup(|app| {
                 let handle = app.handle().clone();
                 app.set_menu(app_menu::build(&handle)?)?;
+
+                // The configured 1320x880 does not fit a 1080p screen at 125%
+                // scaling, and the part that hangs off the bottom is exactly
+                // where the drawer's Edit button lives. Clamp to the work area.
+                if let Some(window) = app.get_webview_window("main") {
+                    if let Ok(Some(monitor)) = window.current_monitor() {
+                        let work = monitor.work_area();
+                        let size = window.inner_size().unwrap_or(work.size);
+                        if size.width > work.size.width || size.height > work.size.height {
+                            let _ = window.set_size(PhysicalSize::new(
+                                size.width.min(work.size.width),
+                                size.height.min(work.size.height),
+                            ));
+                            let _ = window.center();
+                        }
+                    }
+                }
                 Ok(())
             })
             .on_menu_event(|app_handle, event| {

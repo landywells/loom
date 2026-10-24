@@ -38,3 +38,5 @@ apk/
 stderr.txt
 capture.ps1
 capture-*.png
+geo.ps1
+crop-*.png
