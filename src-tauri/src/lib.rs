@@ -118,6 +118,12 @@ pub fn run() {
                 let handle = app.handle().clone();
                 app.set_menu(app_menu::build(&handle)?)?;
 
+                // Explicit: the `maximized` config field is accepted but the
+                // window still arrives at its configured size. Maximizing lets
+                // the OS fit the work area, which no DPI arithmetic can get wrong.
+                if let Some(window) = app.get_webview_window("main") {
+                    let _ = window.maximize();
+                }
                 Ok(())
             })
             .on_menu_event(|app_handle, event| {
