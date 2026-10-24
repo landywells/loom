@@ -81,7 +81,7 @@ mod app_menu {
 }
 
 #[cfg(desktop)]
-use tauri::Emitter;
+use tauri::{Emitter, Manager};
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
