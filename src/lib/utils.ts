@@ -249,6 +249,14 @@ export const PATTERN_META: { pattern: ArtPattern; label: string }[] = [
   { pattern: 'arch', label: 'Arch' },
   { pattern: 'orbit', label: 'Orbit' },
   { pattern: 'type', label: 'Type' },
+  { pattern: 'eclipse', label: 'Eclipse' },
+  { pattern: 'monolith', label: 'Monolith' },
+  { pattern: 'prism', label: 'Prism' },
+  { pattern: 'ripple', label: 'Ripple' },
+  { pattern: 'columns', label: 'Columns' },
+  { pattern: 'cassette', label: 'Cassette' },
+  { pattern: 'halftone', label: 'Halftone' },
+  { pattern: 'burst', label: 'Burst' },
 ];
 
 /** Rough wall-clock cost of moving one unit of progress, used for time logging. */

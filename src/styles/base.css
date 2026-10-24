@@ -1954,6 +1954,306 @@ kbd {
   border-radius: 50%;
 }
 
+/* Eclipse — a disc bitten by the sky */
+
+.art-eclipse {
+  background:
+    radial-gradient(120% 90% at 50% 118%, color-mix(in srgb, var(--b) 18%, transparent), transparent 62%),
+    linear-gradient(150deg, color-mix(in srgb, var(--a) 82%, #000), var(--a) 52%, color-mix(in srgb, var(--a) 74%, var(--b)));
+}
+
+.art-eclipse::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background: radial-gradient(60% 44% at 50% 30%, color-mix(in srgb, var(--c) 12%, transparent), transparent 70%);
+}
+
+.art-eclipse .cover-shape {
+  top: 13%;
+  left: 50%;
+  z-index: 1;
+  width: 56%;
+  aspect-ratio: 1;
+  margin-left: -28%;
+  border-radius: 50%;
+  background: radial-gradient(circle at 36% 32%, color-mix(in srgb, var(--b) 76%, #fff8e8), var(--b) 58%, color-mix(in srgb, var(--b) 62%, var(--a)));
+}
+
+.art-eclipse::after {
+  content: '';
+  position: absolute;
+  top: 6%;
+  left: 58%;
+  z-index: 1;
+  width: 50%;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--a) 88%, #000);
+}
+
+/* Monolith — one tall form, one horizon */
+
+.art-monolith {
+  background: linear-gradient(180deg, color-mix(in srgb, var(--a) 62%, #000), var(--a) 48%, color-mix(in srgb, var(--a) 82%, var(--b)));
+}
+
+.art-monolith::before {
+  content: '';
+  position: absolute;
+  top: 16%;
+  left: 50%;
+  z-index: 0;
+  width: 62%;
+  aspect-ratio: 1;
+  margin-left: -31%;
+  border-radius: 50%;
+  background: radial-gradient(circle, color-mix(in srgb, var(--c) 22%, transparent), transparent 66%);
+}
+
+.art-monolith .cover-shape {
+  top: 11%;
+  left: 50%;
+  z-index: 1;
+  width: 26%;
+  height: 55%;
+  margin-left: -13%;
+  border-radius: 99px 99px 4px 4px / 34% 34% 4px 4px;
+  background: linear-gradient(180deg, var(--b), color-mix(in srgb, var(--b) 42%, #0d0a07));
+  box-shadow: 0 6cqw 18cqw rgba(0, 0, 0, 0.34);
+}
+
+.art-monolith::after {
+  content: '';
+  position: absolute;
+  top: 66%;
+  right: 0;
+  left: 0;
+  z-index: 1;
+  height: 1px;
+  background: color-mix(in srgb, var(--c) 28%, transparent);
+}
+
+/* Prism — a beam split across the face */
+
+.art-prism {
+  background: linear-gradient(170deg, color-mix(in srgb, var(--a) 80%, #000), var(--a));
+}
+
+.art-prism::before {
+  content: '';
+  position: absolute;
+  top: -22%;
+  right: -30%;
+  left: -30%;
+  z-index: 0;
+  height: 92%;
+  background: conic-gradient(from 196deg at 50% 0%,
+    transparent 0 9%,
+    color-mix(in srgb, var(--b) 72%, transparent) 13%,
+    transparent 18%,
+    color-mix(in srgb, var(--c) 52%, transparent) 26%,
+    transparent 32%,
+    color-mix(in srgb, var(--b) 44%, transparent) 40%,
+    transparent 47%);
+  filter: blur(0.6cqw);
+}
+
+.art-prism .cover-shape {
+  top: 17%;
+  left: 50%;
+  z-index: 1;
+  width: 44%;
+  aspect-ratio: 1 / 1.12;
+  margin-left: -22%;
+  background: linear-gradient(160deg, var(--b), color-mix(in srgb, var(--b) 38%, var(--a)));
+  clip-path: polygon(50% 0, 100% 100%, 0 100%);
+}
+
+.art-prism::after {
+  content: '';
+  position: absolute;
+  top: 63%;
+  right: 0;
+  left: 0;
+  z-index: 1;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, color-mix(in srgb, var(--c) 70%, transparent), transparent);
+}
+
+/* Ripple — one drop, everything after it */
+
+.art-ripple {
+  background:
+    repeating-radial-gradient(circle at 50% 33%, transparent 0 5.2cqw, color-mix(in srgb, var(--b) 22%, transparent) 5.2cqw 5.7cqw),
+    radial-gradient(130% 90% at 50% 33%, color-mix(in srgb, var(--a) 42%, var(--b)), var(--a) 72%);
+}
+
+.art-ripple .cover-shape {
+  top: 33%;
+  left: 50%;
+  z-index: 1;
+  width: 11%;
+  aspect-ratio: 1;
+  margin: -5.5% 0 0 -5.5%;
+  border-radius: 50%;
+  background: var(--c);
+  box-shadow: 0 0 10cqw color-mix(in srgb, var(--c) 48%, transparent);
+}
+
+.art-ripple::after {
+  content: '';
+  position: absolute;
+  top: 72%;
+  right: 8%;
+  left: 8%;
+  z-index: 1;
+  height: 1px;
+  background: color-mix(in srgb, var(--c) 22%, transparent);
+}
+
+/* Columns — printed bars, a low sun */
+
+.art-columns {
+  background: repeating-linear-gradient(90deg,
+    color-mix(in srgb, var(--a) 92%, #fff) 0 9%,
+    color-mix(in srgb, var(--a) 84%, #000) 9% 17%,
+    color-mix(in srgb, var(--a) 94%, var(--b)) 17% 23%,
+    var(--a) 23% 36%);
+}
+
+.art-columns .cover-shape {
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 1;
+  height: 58%;
+  background: linear-gradient(180deg, transparent, color-mix(in srgb, var(--a) 78%, #000));
+}
+
+.art-columns::before {
+  content: '';
+  position: absolute;
+  top: 13%;
+  left: 11%;
+  z-index: 0;
+  width: 33%;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: var(--b);
+}
+
+.art-columns::after {
+  content: '';
+  position: absolute;
+  top: 13%;
+  left: 11%;
+  z-index: 1;
+  width: 33%;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  box-shadow: 0 0 16cqw color-mix(in srgb, var(--b) 55%, transparent);
+}
+
+/* Cassette — two reels and a window */
+
+.art-cassette {
+  background: linear-gradient(180deg, var(--a), color-mix(in srgb, var(--a) 74%, #100d0a));
+}
+
+.art-cassette .cover-shape {
+  top: 24%;
+  right: 9%;
+  left: 9%;
+  z-index: 0;
+  height: 36%;
+  border: 1px solid color-mix(in srgb, var(--c) 20%, transparent);
+  border-radius: 3cqw;
+  background: color-mix(in srgb, var(--a) 52%, #0b0907);
+}
+
+.art-cassette::before,
+.art-cassette::after {
+  content: '';
+  position: absolute;
+  top: 32%;
+  z-index: 1;
+  width: 14%;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle, color-mix(in srgb, var(--a) 80%, #000) 0 18%, transparent 19%),
+    radial-gradient(circle at 38% 34%, var(--b), color-mix(in srgb, var(--b) 40%, #000) 72%);
+}
+
+.art-cassette::before {
+  left: 21%;
+}
+
+.art-cassette::after {
+  right: 21%;
+}
+
+/* Halftone — newsprint dots over a warm field */
+
+.art-halftone {
+  background:
+    radial-gradient(90% 70% at 28% 20%, color-mix(in srgb, var(--b) 52%, transparent), transparent 58%),
+    var(--a);
+}
+
+.art-halftone .cover-shape {
+  right: 9%;
+  bottom: 25%;
+  z-index: 0;
+  width: 42%;
+  aspect-ratio: 1;
+  border-radius: 2cqw;
+  background: linear-gradient(150deg, var(--b), color-mix(in srgb, var(--b) 46%, var(--a)));
+  transform: rotate(-7deg);
+}
+
+.art-halftone::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background-image: radial-gradient(circle, color-mix(in srgb, var(--c) 60%, transparent) 1.1cqw, transparent 1.25cqw);
+  background-size: 6.5cqw 6.5cqw;
+  -webkit-mask-image: linear-gradient(160deg, #000 6%, transparent 58%);
+  mask-image: linear-gradient(160deg, #000 6%, transparent 58%);
+  opacity: 0.45;
+}
+
+/* Burst — rays off a single point */
+
+.art-burst {
+  background: radial-gradient(92% 72% at 50% 36%, color-mix(in srgb, var(--a) 52%, var(--b)), var(--a) 74%);
+}
+
+.art-burst::before {
+  content: '';
+  position: absolute;
+  inset: -30%;
+  z-index: 0;
+  background: repeating-conic-gradient(from 0deg at 50% 36%,
+    color-mix(in srgb, var(--c) 16%, transparent) 0 2.6deg,
+    transparent 2.6deg 13deg);
+}
+
+.art-burst .cover-shape {
+  top: 21%;
+  left: 50%;
+  z-index: 1;
+  width: 34%;
+  aspect-ratio: 1;
+  margin-left: -17%;
+  border-radius: 50%;
+  background: radial-gradient(circle at 38% 32%, color-mix(in srgb, var(--b) 72%, #fff), var(--b) 58%, color-mix(in srgb, var(--b) 56%, var(--a)));
+  box-shadow: 0 0 22cqw color-mix(in srgb, var(--b) 40%, transparent);
+}
+
 .cover-shape + .cover-scrim {
   z-index: 2;
 }

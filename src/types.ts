@@ -22,7 +22,15 @@ export type ArtPattern =
   | 'grid'
   | 'arch'
   | 'orbit'
-  | 'type';
+  | 'type'
+  | 'eclipse'
+  | 'monolith'
+  | 'prism'
+  | 'ripple'
+  | 'columns'
+  | 'cassette'
+  | 'halftone'
+  | 'burst';
 
 export interface CoverArt {
   pattern: ArtPattern;
