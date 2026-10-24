@@ -91,7 +91,8 @@ export function SettingsSheet({ prefs, onChange, onSync, syncing, onClose }: Set
             <h3>Sync</h3>
             <p className="settings-lede">
               Your library leaves this device as ciphertext. The passphrase is never stored or
-              sent, so the host of the file cannot read it — and neither can we if you forget it.
+              sent, so whoever hosts the file cannot read it — and if you lose it, that copy
+              cannot be recovered.
             </p>
 
             <div className="settings-targets" role="radiogroup" aria-label="Sync destination">
