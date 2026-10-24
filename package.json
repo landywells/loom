@@ -13,7 +13,8 @@
     "desktop:build": "tauri build",
     "icons": "tauri icon app-icon.png",
     "qa": "node qa-web.mjs",
-    "qa:chrome": "node qa-desktop.mjs"
+    "qa:chrome": "node qa-desktop.mjs",
+    "qa:sync": "node qa-sync.mjs"
   },
   "dependencies": {
     "@tauri-apps/api": "^2.12.4",

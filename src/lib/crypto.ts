@@ -40,18 +40,41 @@ function fromBase64(text: string): Uint8Array {
   return Uint8Array.from(atob(text), (char) => char.charCodeAt(0));
 }
 
-async function deriveKey(passphrase: string, salt: Uint8Array, iterations: number) {
+async function pbkdf2Bits(passphrase: string, salt: Uint8Array, iterations: number) {
   const base = await crypto.subtle.importKey(
     'raw',
     new TextEncoder().encode(passphrase),
     'PBKDF2',
     false,
-    ['deriveKey'],
+    ['deriveBits'],
   );
-  return crypto.subtle.deriveKey(
+  return crypto.subtle.deriveBits(
     { name: 'PBKDF2', salt: salt as unknown as BufferSource, iterations, hash: 'SHA-256' },
     base,
-    { name: 'AES-GCM', length: 256 },
+    256,
+  );
+}
+
+async function deriveKey(passphrase: string, salt: Uint8Array, iterations: number) {
+  const bits = await pbkdf2Bits(passphrase, salt, iterations);
+  return crypto.subtle.importKey('raw', bits, { name: 'AES-GCM' }, false, ['encrypt', 'decrypt']);
+}
+
+/**
+ * The derived bytes, not a key object, are what a device caches: the library
+ * already sits unencrypted on that device's own storage, so remembering them
+ * costs nothing it does not already pay, and it spares the 310k-round
+ * derivation on every single sync. The working key itself stays non-extractable.
+ */
+export async function deriveKeyBase64(passphrase: string, saltBase64: string, iterations: number) {
+  return toBase64(new Uint8Array(await pbkdf2Bits(passphrase, fromBase64(saltBase64), iterations)));
+}
+
+async function keyFromBase64(base64: string) {
+  return crypto.subtle.importKey(
+    'raw',
+    fromBase64(base64) as unknown as BufferSource,
+    { name: 'AES-GCM' },
     false,
     ['encrypt', 'decrypt'],
   );
@@ -59,8 +82,11 @@ async function deriveKey(passphrase: string, salt: Uint8Array, iterations: numbe
 
 export async function encryptJson(value: unknown, passphrase: string): Promise<Envelope> {
   const salt = crypto.getRandomValues(new Uint8Array(16));
+  return seal(value, toBase64(salt), await deriveKey(passphrase, salt, ITERATIONS));
+}
+
+async function seal(value: unknown, saltBase64: string, key: CryptoKey): Promise<Envelope> {
   const iv = crypto.getRandomValues(new Uint8Array(12));
-  const key = await deriveKey(passphrase, salt, ITERATIONS);
   const plaintext = new TextEncoder().encode(JSON.stringify(value));
   const sealed = await crypto.subtle.encrypt(
     { name: 'AES-GCM', iv: iv as unknown as BufferSource },
@@ -69,15 +95,33 @@ export async function encryptJson(value: unknown, passphrase: string): Promise<E
   );
   return {
     v: 1,
-    kdf: { salt: toBase64(salt), iterations: ITERATIONS, hash: 'SHA-256' },
+    kdf: { salt: saltBase64, iterations: ITERATIONS, hash: 'SHA-256' },
     iv: toBase64(iv),
     data: toBase64(new Uint8Array(sealed)),
   };
 }
 
+/** Encrypts with a cached key, reusing the original salt so that key stays valid. */
+export async function encryptJsonWithKey(
+  value: unknown,
+  saltBase64: string,
+  keyBase64: string,
+) {
+  return seal(value, saltBase64, await keyFromBase64(keyBase64));
+}
+
 /** Throws if the passphrase is wrong — AES-GCM authenticates, so guesses fail loudly. */
-export async function decryptJson<T>(envelope: Envelope, passphrase: string): Promise<T> {
-  const key = await deriveKey(passphrase, fromBase64(envelope.kdf.salt), envelope.kdf.iterations);
+export async function decryptJson<T>(
+  envelope: Envelope,
+  secret: { passphrase?: string; key?: string },
+): Promise<{ value: T; key: string }> {
+  const key = secret.key
+    ? await keyFromBase64(secret.key)
+    : await deriveKey(
+        secret.passphrase ?? '',
+        fromBase64(envelope.kdf.salt),
+        envelope.kdf.iterations,
+      );
   let opened: ArrayBuffer;
   try {
     opened = await crypto.subtle.decrypt(
@@ -88,5 +132,8 @@ export async function decryptJson<T>(envelope: Envelope, passphrase: string): Pr
   } catch {
     throw new Error('That passphrase does not open this library.');
   }
-  return JSON.parse(new TextDecoder().decode(opened)) as T;
+  return {
+    value: JSON.parse(new TextDecoder().decode(opened)) as T,
+    key: secret.key ?? (await deriveKeyBase64(secret.passphrase ?? '', envelope.kdf.salt, envelope.kdf.iterations)),
+  };
 }

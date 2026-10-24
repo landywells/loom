@@ -80,7 +80,9 @@ export async function fetchSongPreview(
     enc([creator, title].filter(Boolean).join(' ')) +
     '&media=music&entity=song&limit=10';
 
-  const res = await fetch(url, { signal });
+  // Apple is usually quick and occasionally silent; a hung request should not
+  // leave the button spinning forever.
+  const res = await fetch(url, { signal: signal ?? AbortSignal.timeout(6000) });
   if (!res.ok) return null;
   const body = (await res.json()) as { results?: ItunesTrack[] };
 

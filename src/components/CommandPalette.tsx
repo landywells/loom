@@ -12,6 +12,7 @@ import {
   Moon,
   Plus,
   Search,
+  SlidersHorizontal,
   Sun,
   Upload,
   X,
@@ -30,6 +31,7 @@ interface CommandPaletteProps {
   onNavigate: (page: Page) => void;
   onAdd: () => void;
   onToggleTheme: () => void;
+  onSettings: () => void;
   onExport: () => void;
   onImport: () => void;
   onAbout: () => void;
@@ -65,6 +67,7 @@ export function CommandPalette({
   onNavigate,
   onAdd,
   onToggleTheme,
+  onSettings,
   onExport,
   onImport,
   onAbout,
@@ -139,6 +142,16 @@ export function CommandPalette({
         icon: Upload,
         action: () => {
           onImport();
+          onClose();
+        },
+      },
+      {
+        key: 'action-settings',
+        label: 'Sync and listening history',
+        hint: 'Keys, passphrase, destination',
+        icon: SlidersHorizontal,
+        action: () => {
+          onSettings();
           onClose();
         },
       },

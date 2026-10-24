@@ -230,7 +230,7 @@ check(
 );
 
 await page.locator('.drawer-preview > button').click();
-await page.waitForTimeout(4000);
+await page.waitForTimeout(9000);
 const clip = await page.evaluate(() => {
   const audio = document.querySelector('.drawer-preview + audio, .drawer-preview audio');
   return {
@@ -259,10 +259,11 @@ const sealed = await page.evaluate(async () => {
   const envelope = await c.encryptJson(secret, 'correct horse battery staple');
   const tookMs = Math.round(performance.now() - started);
   const wire = JSON.stringify(envelope);
-  const back = await c.decryptJson(JSON.parse(wire), 'correct horse battery staple');
+  const opened = await c.decryptJson(JSON.parse(wire), { passphrase: 'correct horse battery staple' });
+  const back = opened.value;
   let wrongKey = null;
   try {
-    await c.decryptJson(envelope, 'not the passphrase');
+    await c.decryptJson(envelope, { passphrase: 'not the passphrase' });
   } catch (error) {
     wrongKey = error.message;
   }
@@ -271,6 +272,7 @@ const sealed = await page.evaluate(async () => {
     tookMs,
     leaks: /Someone I love|private detail/.test(wire),
     roundTrips: JSON.stringify(back) === JSON.stringify(secret),
+    cachesKey: /^.{43,}$/.test(opened.key),
     wrongKey,
     detects: c.isEnvelope(envelope) && !c.isEnvelope(secret),
     shape: { hasSalt: !!envelope.kdf.salt, iv: envelope.iv.length, iterations: envelope.kdf.iterations },

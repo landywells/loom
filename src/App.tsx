@@ -39,7 +39,9 @@ import { CommandPalette } from './components/CommandPalette';
 import { TitleBar } from './components/TitleBar';
 import { hasWindowChrome, isDesktop, notify, onMenuCommand, setWindowTheme, type MenuCommand } from './lib/desktop';
 import { ShortcutSheet } from './components/ShortcutSheet';
-import { backfillStamps, mergeLibrary, stampRevisions, type Revisions } from './lib/sync';
+import { SettingsSheet } from './components/SettingsSheet';
+import { backfillStamps, mergeLibrary, pullSync, pushSync, stampRevisions, type Revisions } from './lib/sync';
+import { loadPrefs, savePrefs, type Prefs } from './lib/prefs';
 
 const DATA_KEY = 'loom.library.v1';
 const THEME_KEY = 'loom.theme.v1';
@@ -120,6 +122,11 @@ function App() {
   const fileInput = useRef<HTMLInputElement>(null);
   const [revisions] = useState<Revisions>(() => new Map());
   const snapshot = useRef<AppData>(data);
+  const [prefs, setPrefs] = useState<Prefs>(loadPrefs);
+  const prefsRef = useRef(prefs);
+  const syncRef = useRef<(passphrase?: string) => Promise<void>>(async () => {});
+  const [settingsOpen, setSettingsOpen] = useState(false);
+  const [syncing, setSyncing] = useState(false);
 
   const drawerItem = data.items.find((item) => item.id === drawerId) ?? null;
 
@@ -768,6 +775,64 @@ function App() {
 
   const streak = currentStreak(data.timeLog);
 
+  useEffect(() => {
+    prefsRef.current = prefs;
+    savePrefs(prefs);
+  }, [prefs]);
+
+  const syncNow = async (passphrase = '') => {
+    const sync = prefsRef.current.sync;
+    if (!sync || sync.target.kind === 'off') return;
+    const secret = { key: sync.key, salt: sync.salt, passphrase: passphrase || undefined };
+    if (!secret.key && !secret.passphrase) {
+      pushToast('This copy is encrypted — type its passphrase first.');
+      return;
+    }
+    setSyncing(true);
+    try {
+      const pulled = await pullSync(sync.target, secret, snapshot.current, revisions);
+      const merged = pulled?.data ?? snapshot.current;
+      if (pulled) setData(pulled.data);
+      const active =
+        pulled?.key && pulled.salt ? { ...secret, key: pulled.key, salt: pulled.salt } : secret;
+      const pushed = await pushSync(sync.target, active, merged);
+      setPrefs((current) => ({
+        ...current,
+        sync: {
+          target: pushed.target,
+          key: pushed.key,
+          salt: pushed.salt,
+          lastSyncedAt: Date.now(),
+        },
+      }));
+      announce(
+        pulled && (pulled.report.added || pulled.report.updated)
+          ? `Synced — ${pulled.report.added} new and ${pulled.report.updated} updated came in.`
+          : 'Synced. Both copies agree.',
+      );
+    } catch (error) {
+      pushToast(`Sync failed. ${(error as Error).message}`);
+    } finally {
+      setSyncing(false);
+    }
+  };
+  syncRef.current = syncNow;
+
+  // The other device has probably been busy while this one was in the background.
+  useEffect(() => {
+    if (!prefs.sync?.key || prefs.sync.target.kind === 'off') return;
+    const onFocus = () => void syncRef.current();
+    window.addEventListener('focus', onFocus);
+    return () => window.removeEventListener('focus', onFocus);
+  }, [prefs.sync?.key, prefs.sync?.target.kind]);
+
+  // Then push once the library settles, so typing does not trigger a sync per keystroke.
+  useEffect(() => {
+    if (!prefs.sync?.key || prefs.sync.target.kind === 'off') return;
+    const timer = window.setTimeout(() => void syncRef.current(), 15_000);
+    return () => window.clearTimeout(timer);
+  }, [data, prefs.sync?.key, prefs.sync?.target.kind]);
+
   const renderPage = () => {
     if (page === 'library') {
       return (
@@ -842,6 +907,7 @@ function App() {
           onAdd={() => openAdd()}
           theme={theme}
           onToggleTheme={() => setTheme((current) => (current === 'light' ? 'dark' : 'light'))}
+          onSettings={() => setSettingsOpen(true)}
           activities={data.activities}
           onOpenItem={openItem}
           onNavigate={navigate}
@@ -885,6 +951,16 @@ function App() {
       />
 
       {shortcutsOpen && <ShortcutSheet onClose={() => setShortcutsOpen(false)} />}
+
+      {settingsOpen && (
+        <SettingsSheet
+          prefs={prefs}
+          onChange={setPrefs}
+          onSync={(passphrase) => void syncNow(passphrase)}
+          syncing={syncing}
+          onClose={() => setSettingsOpen(false)}
+        />
+      )}
 
       {drawerItem && (
         <ItemDrawer
@@ -936,6 +1012,7 @@ function App() {
           onExport={exportData}
           onImport={() => fileInput.current?.click()}
           onAbout={() => setAboutOpen(true)}
+          onSettings={() => setSettingsOpen(true)}
         />
       )}
 

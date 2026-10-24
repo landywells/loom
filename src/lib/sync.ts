@@ -1,4 +1,12 @@
 import type { AppData } from '../types';
+import {
+  decryptJson,
+  deriveKeyBase64,
+  encryptJson,
+  encryptJsonWithKey,
+  isEnvelope,
+} from './crypto';
+import { pullRemote, pushRemote, type SyncTarget } from './remotes';
 
 export type Revisions = Map<string, { signature: string; at: number }>;
 
@@ -109,4 +117,80 @@ export function mergeLibrary(
     data: { ...local, items, collections, activities, timeLog, reading },
     report,
   };
+}
+
+export interface SyncSecret {
+  key?: string;
+  salt?: string;
+  passphrase?: string;
+}
+
+/**
+ * Folds the remote copy in. `null` means there is nothing out there yet.
+ * When it returns a key and salt, the caller should cache them: that is the
+ * remote's own salt, so pushing back never rotates it and strands a second
+ * device's cached key.
+ */
+export async function pullSync(
+  target: SyncTarget,
+  secret: SyncSecret,
+  local: AppData,
+  revisions: Revisions,
+  signal?: AbortSignal,
+): Promise<{ data: AppData; report: MergeReport; key?: string; salt?: string } | null> {
+  const doc = await pullRemote(target, signal);
+  if (!doc) return null;
+
+  let incoming: Partial<AppData>;
+  let rekeyed: { key?: string; salt?: string } = {};
+
+  if (isEnvelope(doc)) {
+    if (!secret.key && !secret.passphrase) {
+      throw new Error('That copy is locked — enter its passphrase.');
+    }
+    let opened;
+    try {
+      opened = await decryptJson<AppData>(doc, secret);
+    } catch (error) {
+      // A cached key can be stale if this device joined before the first sync;
+      // the passphrase still opens it if the user has it.
+      if (!secret.passphrase) {
+        throw new Error(
+          'Another device started this copy — type the passphrase to join it.',
+        );
+      }
+      opened = await decryptJson<AppData>(doc, { passphrase: secret.passphrase });
+    }
+    incoming = opened.value;
+    rekeyed = { key: opened.key, salt: doc.kdf.salt };
+  } else {
+    // A plain export written before encryption existed still merges.
+    incoming = doc as Partial<AppData>;
+  }
+
+  return { ...mergeLibrary(local, incoming, revisions), ...rekeyed };
+}
+
+/**
+ * Reuses the original salt whenever a cached key exists, because deriving
+ * against a fresh salt would strand every other device's stored key.
+ * Returns only the key and salt — the passphrase must never be persisted.
+ */
+export async function pushSync(
+  target: SyncTarget,
+  secret: SyncSecret,
+  data: AppData,
+  signal?: AbortSignal,
+): Promise<{ target: SyncTarget; key: string; salt: string }> {
+  const reusable = Boolean(secret.key && secret.salt);
+  const envelope = reusable
+    ? await encryptJsonWithKey(data, secret.salt!, secret.key!)
+    : await encryptJson(data, secret.passphrase ?? '');
+
+  const salt = envelope.kdf.salt;
+  const key = reusable
+    ? secret.key!
+    : await deriveKeyBase64(secret.passphrase ?? '', salt, envelope.kdf.iterations);
+
+  return { target: await pushRemote(target, envelope, signal), key, salt };
 }

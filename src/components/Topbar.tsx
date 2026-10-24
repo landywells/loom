@@ -6,6 +6,7 @@ import {
   Moon,
   Plus,
   Search,
+  SlidersHorizontal,
   Sun,
 } from 'lucide-react';
 import type { Activity, Page, Theme } from '../types';
@@ -28,6 +29,7 @@ interface TopbarProps {
   onAdd: () => void;
   theme: Theme;
   onToggleTheme: () => void;
+  onSettings: () => void;
   activities: Activity[];
   onOpenItem: (id: string) => void;
   onNavigate: (page: Page) => void;
@@ -42,6 +44,7 @@ export function Topbar({
   onAdd,
   theme,
   onToggleTheme,
+  onSettings,
   activities,
   onOpenItem,
   onNavigate,
@@ -203,6 +206,10 @@ export function Topbar({
                 </button>
               </div>
             </div>
+            <button className="settings-link" onClick={onSettings}>
+              <SlidersHorizontal size={13} />
+              Sync and listening history
+            </button>
             <p className="profile-note">
               A quiet home for everything you’re into. Your library lives {isDesktop ? 'on this device' : 'in this browser'}.
             </p>
