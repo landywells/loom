@@ -114,16 +114,34 @@ pub fn run() {
                 // scaling, and the part that hangs off the bottom is exactly
                 // where the drawer's Edit button lives. Clamp to the work area.
                 if let Some(window) = app.get_webview_window("main") {
-                    if let Ok(Some(monitor)) = window.current_monitor() {
-                        let work = monitor.work_area();
-                        let size = window.inner_size().unwrap_or(work.size);
-                        if size.width > work.size.width || size.height > work.size.height {
-                            let _ = window.set_size(PhysicalSize::new(
-                                size.width.min(work.size.width),
-                                size.height.min(work.size.height),
-                            ));
-                            let _ = window.center();
+                    match window.current_monitor() {
+                        Ok(Some(monitor)) => {
+                            let work = monitor.work_area();
+                            let size = window.inner_size().unwrap_or(work.size);
+                            eprintln!(
+                                "loom: work={:?}x{:?} inner={:?}x{:?} scale={:?}",
+                                work.size.width,
+                                work.size.height,
+                                size.width,
+                                size.height,
+                                monitor.scale_factor()
+                            );
+                            if size.width > work.size.width || size.height > work.size.height {
+                                let out = window.set_size(PhysicalSize::new(
+                                    size.width.min(work.size.width),
+                                    size.height.min(work.size.height),
+                                ));
+                                eprintln!("loom: clamped -> {:?}", out.is_ok());
+                                let _ = window.center();
+                                eprintln!(
+                                    "loom: after={:?}",
+                                    window.inner_size().map(|s| (s.width, s.height))
+                                );
+                            } else {
+                                eprintln!("loom: no clamp needed");
+                            }
                         }
+                        other => eprintln!("loom: monitor lookup failed {:?}", other.is_err()),
                     }
                 }
                 Ok(())
