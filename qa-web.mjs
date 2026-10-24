@@ -251,6 +251,38 @@ if (clip.state?.includes('is-playing')) {
     !(await page.evaluate(() => document.querySelector('.drawer-preview').className.includes('is-playing'))));
 }
 
+// ---------- the synced copy is unreadable without the passphrase ----------
+const sealed = await page.evaluate(async () => {
+  const c = await import('/src/lib/crypto.ts');
+  const secret = { items: [{ title: 'Someone I love', notes: 'a private detail' }] };
+  const started = performance.now();
+  const envelope = await c.encryptJson(secret, 'correct horse battery staple');
+  const tookMs = Math.round(performance.now() - started);
+  const wire = JSON.stringify(envelope);
+  const back = await c.decryptJson(JSON.parse(wire), 'correct horse battery staple');
+  let wrongKey = null;
+  try {
+    await c.decryptJson(envelope, 'not the passphrase');
+  } catch (error) {
+    wrongKey = error.message;
+  }
+  return {
+    available: c.subtleAvailable,
+    tookMs,
+    leaks: /Someone I love|private detail/.test(wire),
+    roundTrips: JSON.stringify(back) === JSON.stringify(secret),
+    wrongKey,
+    detects: c.isEnvelope(envelope) && !c.isEnvelope(secret),
+    shape: { hasSalt: !!envelope.kdf.salt, iv: envelope.iv.length, iterations: envelope.kdf.iterations },
+  };
+});
+check('web crypto is available in this shell', sealed.available);
+check('ciphertext leaks no plaintext', !sealed.leaks, `wire: ${sealed.shape.iv}b iv, ${sealed.shape.iterations}k rounds`);
+check('round-trips to the same library', sealed.roundTrips);
+check('a wrong passphrase is refused', /passphrase/i.test(sealed.wrongKey || ''), sealed.wrongKey);
+check('encrypted and plain files are told apart', sealed.detects);
+check('unlocking stays under 2s on slow hardware', sealed.tookMs < 2000, `${sealed.tookMs}ms`);
+
 console.log(`\n${errors.length ? errors.join('\n') : 'no console or page errors'}`);
 console.log(failures ? `\n${failures} check(s) failed` : '\nall checks passed');
 await ctx.close();
