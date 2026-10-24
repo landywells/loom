@@ -38,6 +38,22 @@ jobs:
       # tsc -b, then vite build, then the Rust release build + NSIS/MSI bundling
       - run: npm run desktop:build
 
+      # A config the plugins reject only shows up when the binary actually
+      # starts, and `panic = "abort"` hides that behind an exit code — so start
+      # it, keep it alive a few seconds, and print the panic if it dies.
+      - name: Smoke test the built binary
+        shell: pwsh
+        run: |
+          $exe = (Resolve-Path src-tauri/target/release/loom.exe).Path
+          $p = Start-Process $exe -PassThru -RedirectStandardError stderr.txt
+          Start-Sleep -Seconds 10
+          if ($p.HasExited) {
+            Get-Content stderr.txt
+            throw "Loom exited immediately with code $($p.ExitCode)"
+          }
+          "Loom is running."
+          Stop-Process -Id $p.Id -Force
+
       - uses: actions/upload-artifact@v4
         with:
           name: loom-windows-x64

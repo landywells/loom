@@ -53,11 +53,5 @@
         "displayLanguageSelector": false
       }
     }
-  },
-  "plugins": {
-    "window-state": {
-      "filename": "loom.window-state.toml",
-      "maximized": true
-    }
   }
 }

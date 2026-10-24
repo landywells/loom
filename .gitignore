@@ -32,3 +32,9 @@ installer/
 
 # downloaded CI artifacts
 apk/
+
+# scratch files from local verification
+/stdout.txt
+stderr.txt
+capture.ps1
+capture-*.png

@@ -101,7 +101,11 @@ pub fn run() {
                     let _ = window.set_focus();
                 }
             }))
-            .plugin(tauri_plugin_window_state::Builder::default().build())
+            .plugin(
+                tauri_plugin_window_state::Builder::default()
+                    .with_filename("loom.window-state.json")
+                    .build(),
+            )
             .setup(|app| {
                 let handle = app.handle().clone();
                 app.set_menu(app_menu::build(&handle)?)?;
