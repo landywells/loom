@@ -10,6 +10,7 @@ import {
 } from 'lucide-react';
 import type { Activity, Page, Theme } from '../types';
 import { CURRENT_USER } from '../lib/data';
+import { isDesktop } from '../lib/desktop';
 import { SHORTCUT_MOD, relativeTime } from '../lib/utils';
 import { MediaGlyph } from './MediaGlyph';
 
@@ -202,7 +203,9 @@ export function Topbar({
                 </button>
               </div>
             </div>
-            <p className="profile-note">A quiet home for everything you’re into. Your library lives in this browser.</p>
+            <p className="profile-note">
+              A quiet home for everything you’re into. Your library lives {isDesktop ? 'on this device' : 'in this browser'}.
+            </p>
           </div>
         )}
       </div>
