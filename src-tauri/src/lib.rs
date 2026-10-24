@@ -1,5 +1,5 @@
 use tauri::menu::{Menu, MenuItem, PredefinedMenuItem, Submenu};
-use tauri::{AppHandle, Emitter, Manager};
+use tauri::{AppHandle, Emitter, Manager, Runtime};
 
 /// Menu ids are forwarded to the web layer as a `loom:menu` event, so menu
 /// clicks and their keyboard accelerators drive the same code as UI buttons.
@@ -10,9 +10,8 @@ const MENU_EXPORT: &str = "export";
 const MENU_THEME: &str = "theme";
 const MENU_SHORTCUTS: &str = "shortcuts";
 const MENU_ABOUT: &str = "about";
-const GOTO: &str = "goto:";
 
-fn build_menu(app: &AppHandle) -> tauri::Result<Menu<AppHandle>> {
+fn build_menu<R: Runtime>(app: &AppHandle<R>) -> tauri::Result<Menu<R>> {
     let new_entry = MenuItem::with_id(app, MENU_NEW, "New entry…", true, Some("CmdOrCtrl+N"))?;
     let search = MenuItem::with_id(app, MENU_SEARCH, "Quick find…", true, Some("CmdOrCtrl+K"))?;
     let import = MenuItem::with_id(app, MENU_IMPORT, "Import library…", true, Some("CmdOrCtrl+I"))?;
@@ -28,21 +27,29 @@ fn build_menu(app: &AppHandle) -> tauri::Result<Menu<AppHandle>> {
         MenuItem::with_id(app, MENU_SHORTCUTS, "Keyboard shortcuts", true, Some("CmdOrCtrl+/"))?;
     let about = MenuItem::with_id(app, MENU_ABOUT, "About Loom", true, None::<&str>)?;
 
-    let overview = MenuItem::with_id(app, format!("{GOTO}overview"), "Overview", true, Some("Alt+1"))?;
-    let library = MenuItem::with_id(app, format!("{GOTO}library"), "Library", true, Some("Alt+2"))?;
-    let discover = MenuItem::with_id(app, format!("{GOTO}discover"), "Discover", true, Some("Alt+3"))?;
+    let overview = MenuItem::with_id(app, "goto:overview", "Overview", true, Some("Alt+1"))?;
+    let library = MenuItem::with_id(app, "goto:library", "Library", true, Some("Alt+2"))?;
+    let discover = MenuItem::with_id(app, "goto:discover", "Discover", true, Some("Alt+3"))?;
     let collections =
-        MenuItem::with_id(app, format!("{GOTO}collections"), "Collections", true, Some("Alt+4"))?;
-    let insights = MenuItem::with_id(app, format!("{GOTO}insights"), "Insights", true, Some("Alt+5"))?;
+        MenuItem::with_id(app, "goto:collections", "Collections", true, Some("Alt+4"))?;
+    let insights = MenuItem::with_id(app, "goto:insights", "Insights", true, Some("Alt+5"))?;
 
-    let sep = PredefinedMenuItem::separator(app)?;
+    let file_sep = PredefinedMenuItem::separator(app)?;
+    let file_sep_two = PredefinedMenuItem::separator(app)?;
     let close = PredefinedMenuItem::close_window(app, Some("Close Loom"))?;
+    let view_sep = PredefinedMenuItem::separator(app)?;
     let minimize = PredefinedMenuItem::minimize(app, Some("Minimize"))?;
     let fullscreen = PredefinedMenuItem::fullscreen(app, Some("Full Screen"))?;
 
-    let file = Submenu::with_items(app, "File", true, &[&new_entry, &search, &sep, &import, &export, &sep, &close])?;
-    let view = Submenu::with_items(app, "View", true, &[&theme, &sep, &shortcuts])?;
-    let go = Submenu::with_items(app, "Go to", true, &[&overview, &library, &discover, &collections, &insights])?;
+    let file = Submenu::with_items(
+        app,
+        "File",
+        true,
+        &[&new_entry, &search, &file_sep, &import, &export, &file_sep_two, &close],
+    )?;
+    let view = Submenu::with_items(app, "View", true, &[&theme, &view_sep, &shortcuts])?;
+    let go =
+        Submenu::with_items(app, "Go to", true, &[&overview, &library, &discover, &collections, &insights])?;
     let window = Submenu::with_items(app, "Window", true, &[&minimize, &fullscreen])?;
     let help = Submenu::with_items(app, "Help", true, &[&about])?;
 
@@ -65,12 +72,10 @@ pub fn run() {
         .setup(|app| {
             let handle = app.handle().clone();
             app.set_menu(build_menu(&handle)?)?;
-
-            app.on_menu_event(move |app_handle, event| {
-                let _ = app_handle.emit("loom:menu", event.id().as_ref().to_string());
-            });
-
             Ok(())
+        })
+        .on_menu_event(|app_handle, event| {
+            let _ = app_handle.emit("loom:menu", event.id().as_ref().to_string());
         })
         .run(tauri::generate_context!())
         .expect("Loom failed to start");

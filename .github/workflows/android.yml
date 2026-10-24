@@ -1,0 +1,81 @@
+name: android
+
+# The ubuntu runner already ships the Android SDK, an NDK and a JDK, so the
+# phone build needs nothing installed locally either.
+
+on:
+  workflow_dispatch:
+    inputs:
+      signed:
+        description: Build a release AAB signed with the secrets below
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  android:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: aarch64-linux-android,armv7-linux-androideabi,i686-linux-android,x86_64-linux-android
+
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: src-tauri
+
+      # Gradle wants NDK_HOME; the image only exports ANDROID_NDK_LATEST_HOME.
+      - name: Point the NDK at the version this runner ships
+        run: echo "NDK_HOME=${ANDROID_NDK_LATEST_HOME}" >> "$GITHUB_ENV"
+
+      - run: npm ci
+
+      - name: Generate the Android project
+        run: npx tauri android init
+
+      - name: Decode the release keystore
+        if: ${{ inputs.signed }}
+        env:
+          KEYSTORE: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          STORE_PASSWORD: ${{ secrets.ANDROID_STORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+        run: |
+          printf '%s' "$KEYSTORE" | base64 -d > "$RUNNER_TEMP/loom.keystore"
+          {
+            echo "storeFile=$RUNNER_TEMP/loom.keystore"
+            echo "storePassword=$STORE_PASSWORD"
+            echo "keyAlias=$KEY_ALIAS"
+            echo "keyPassword=$KEY_PASSWORD"
+          } > src-tauri/gen/android/keystore.properties
+
+      - name: Build
+        env:
+          TAURI_ANDROID_ARGS: ${{ inputs.signed && '--aab' || '--apk --debug' }}
+        run: npx tauri android build $TAURI_ANDROID_ARGS
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: loom-android
+          path: |
+            src-tauri/gen/android/app/build/outputs/**/*.apk
+            src-tauri/gen/android/build/outputs/**/*.aab
+          if-no-files-found: error
