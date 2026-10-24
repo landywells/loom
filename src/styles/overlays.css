@@ -489,6 +489,113 @@
   color: var(--bg);
 }
 
+/* ---------- Playback handoff ---------- */
+
+.drawer-preview {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 10px;
+  border: 1px solid var(--line);
+  border-radius: 11px;
+  background: var(--surface);
+  transition: border-color 0.25s ease;
+}
+
+.drawer-preview.is-playing {
+  border-color: color-mix(in srgb, var(--accent) 42%, var(--line));
+}
+
+.drawer-preview > button {
+  display: grid;
+  flex: 0 0 auto;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  border: 1px solid var(--line-strong);
+  border-radius: 50%;
+  background: var(--bg-elevated);
+  color: var(--ink);
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease,
+    color 0.2s ease;
+}
+
+.drawer-preview > button:hover:not(:disabled) {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.drawer-preview > button:disabled {
+  cursor: default;
+  opacity: 0.45;
+}
+
+.drawer-preview.is-playing > button {
+  border-color: var(--accent);
+  background: var(--accent);
+  color: var(--bg);
+}
+
+.drawer-preview-copy {
+  display: grid;
+  min-width: 0;
+  gap: 2px;
+}
+
+.drawer-preview-copy strong {
+  overflow: hidden;
+  font-size: 11px;
+  font-weight: 500;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.drawer-preview-copy span {
+  overflow: hidden;
+  color: var(--faint);
+  font-family: var(--font-mono);
+  font-size: 8px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.drawer-play-targets {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  margin-top: 7px;
+}
+
+.drawer-play-targets button {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  height: 27px;
+  padding: 0 8px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  color: var(--muted);
+  font-size: 8px;
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease,
+    color 0.2s ease;
+}
+
+.drawer-play-targets button:hover {
+  border-color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 7%, transparent);
+  color: var(--accent);
+}
+
+.drawer-play-targets button svg {
+  opacity: 0.6;
+}
+
 .drawer-tags {
   display: flex;
   flex-wrap: wrap;

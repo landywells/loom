@@ -1,5 +1,6 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import {
+  ArrowUpRight,
   CalendarDays,
   ChevronLeft,
   ChevronRight,
@@ -7,7 +8,9 @@ import {
   Clock3,
   Heart,
   Minus,
+  Pause,
   Pencil,
+  Play,
   Plus,
   Trash2,
   X,
@@ -26,6 +29,8 @@ import {
   statusLabel,
 } from '../lib/utils';
 import { useFocusTrap } from '../lib/useFocusTrap';
+import { fetchSongPreview, playTargets, type SongPreview } from '../lib/music';
+import { openExternal } from '../lib/desktop';
 import { Cover } from './Cover';
 import { CreatorLink } from './CreatorLink';
 import { MediaGlyph } from './MediaGlyph';
@@ -71,6 +76,41 @@ export function ItemDrawer({
   const step = progressStep(item);
   const itemActivities = activities.filter((activity) => activity.itemId === item.id).slice(0, 3);
   const notesChanged = notes !== item.notes;
+
+  const playable = item.type === 'music' || item.type === 'podcast' || item.type === 'video';
+  const audioRef = useRef<HTMLAudioElement>(null);
+  const [preview, setPreview] = useState<SongPreview | null>(null);
+  const [previewState, setPreviewState] = useState<'idle' | 'loading' | 'ready' | 'playing' | 'missing'>('idle');
+
+  useEffect(() => {
+    audioRef.current?.pause();
+    setPreview(null);
+    setPreviewState('idle');
+  }, [item.id]);
+
+  useEffect(() => () => audioRef.current?.pause(), []);
+
+  const togglePreview = async () => {
+    const audio = audioRef.current;
+    if (!audio || previewState === 'loading') return;
+    if (previewState === 'playing') {
+      audio.pause();
+      return;
+    }
+    if (preview) {
+      await audio.play().catch(() => setPreviewState('missing'));
+      return;
+    }
+    setPreviewState('loading');
+    const found = await fetchSongPreview(item.title, item.creator).catch(() => null);
+    if (!found) {
+      setPreviewState('missing');
+      return;
+    }
+    setPreview(found);
+    audio.src = found.url;
+    await audio.play().catch(() => setPreviewState('missing'));
+  };
 
   useEffect(() => {
     setNotes(item.notes);
@@ -219,6 +259,59 @@ export function ItemDrawer({
                 </div>
               </div>
             </div>
+
+            {playable && (
+              <div className="drawer-section">
+                <div className="drawer-section-heading">
+                  <span>Play</span>
+                  {item.type === 'music' && <span>30-second clip</span>}
+                </div>
+
+                {item.type === 'music' && (
+                  <div className={`drawer-preview ${previewState === 'playing' ? 'is-playing' : ''}`}>
+                    <button
+                      onClick={togglePreview}
+                      disabled={previewState === 'loading' || previewState === 'missing'}
+                      aria-label={previewState === 'playing' ? 'Pause the clip' : 'Play a 30 second clip'}
+                    >
+                      {previewState === 'playing' ? <Pause size={14} /> : <Play size={14} />}
+                    </button>
+                    <div className="drawer-preview-copy">
+                      <strong>
+                        {previewState === 'missing'
+                          ? 'No clip for this one'
+                          : previewState === 'loading'
+                            ? 'Finding a clip…'
+                            : preview?.track ?? item.title}
+                      </strong>
+                      <span>
+                        {preview
+                          ? `${preview.artist} · via Apple`
+                          : previewState === 'missing'
+                            ? 'Try a service below instead'
+                            : 'Tap to audition it'}
+                      </span>
+                    </div>
+                    <audio
+                      ref={audioRef}
+                      preload="none"
+                      onPlay={() => setPreviewState('playing')}
+                      onPause={() => setPreviewState((state) => (state === 'playing' ? 'ready' : state))}
+                      onEnded={() => setPreviewState('ready')}
+                    />
+                  </div>
+                )}
+
+                <div className="drawer-play-targets">
+                  {playTargets(item).map((target) => (
+                    <button key={target.id} onClick={() => void openExternal(target.url)}>
+                      {target.label}
+                      <ArrowUpRight size={12} />
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
 
             <div className="drawer-section">
               <div className="drawer-section-heading">

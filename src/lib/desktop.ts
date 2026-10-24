@@ -56,6 +56,24 @@ export async function setWindowTheme(theme: 'light' | 'dark') {
   await win?.setTheme(theme).catch(() => win?.setTheme(null));
 }
 
+/**
+ * Hands a URL to the operating system rather than opening it in the app's own
+ * webview — on Android that means the user's chosen music client, on desktop
+ * their browser. Falls back to a tab if the shell cannot help.
+ */
+export async function openExternal(url: string) {
+  if (isDesktop) {
+    try {
+      const { openUrl } = await import('@tauri-apps/plugin-opener');
+      await openUrl(url);
+      return;
+    } catch {
+      // A missing opener should not strand the link.
+    }
+  }
+  window.open(url, '_blank', 'noopener,noreferrer');
+}
+
 /** Native OS notification — used when an action happens out of sight. */
 export async function notify(title: string, body: string) {
   if (!isDesktop) return;

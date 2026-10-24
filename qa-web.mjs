@@ -186,6 +186,71 @@ const stillMerged = await page.evaluate(
 );
 check('the merge survives a restart', stillMerged);
 
+// ---------- music playback: preview resolution + handoff ----------
+const preview = await page.evaluate(async () => {
+  const music = await import('/src/lib/music.ts');
+  return music.fetchSongPreview('Get Lucky', 'Daft Punk');
+});
+check(
+  'preview resolves the right song',
+  !!preview && /get lucky/i.test(preview.track) && preview.url.startsWith('https://'),
+  preview ? `${preview.track} — ${preview.artist}` : 'null',
+);
+const wrongSong = await page.evaluate(async () => {
+  const music = await import('/src/lib/music.ts');
+  return music.fetchSongPreview('Bohemian Rhapsody', 'Miles Davis');
+});
+check('refuses a clip that is not the song', wrongSong === null, JSON.stringify(wrongSong));
+
+await page.goto(`${BASE}/#/library`, { waitUntil: 'networkidle' });
+await page.locator('.library-controls button', { hasText: 'Music' }).first().click();
+await page.waitForTimeout(400);
+await page.locator('.media-card').first().click();
+await page.waitForSelector('.item-drawer');
+check('play section appears on music', (await page.locator('.drawer-play-targets button').count()) === 6);
+const ytm = await page
+  .locator('.drawer-play-targets button', { hasText: 'YouTube Music' })
+  .count();
+check('hands off to YouTube Music', ytm === 1);
+
+await page.evaluate(() => {
+  window.__opened = null;
+  window.open = (url) => {
+    window.__opened = url;
+    return null;
+  };
+});
+await page.locator('.drawer-play-targets button', { hasText: 'Spotify' }).click();
+await page.waitForTimeout(300);
+const opened = await page.evaluate(() => window.__opened);
+check(
+  'handoff opens a real search URL',
+  /open\.spotify\.com\/search\//.test(opened || ''),
+  opened,
+);
+
+await page.locator('.drawer-preview > button').click();
+await page.waitForTimeout(4000);
+const clip = await page.evaluate(() => {
+  const audio = document.querySelector('.drawer-preview + audio, .drawer-preview audio');
+  return {
+    state: document.querySelector('.drawer-preview')?.className,
+    copy: document.querySelector('.drawer-preview-copy')?.textContent?.replace(/\s+/g, ' '),
+    src: audio?.currentSrc ?? audio?.src ?? null,
+    time: audio?.currentTime ?? 0,
+  };
+});
+const clipOk =
+  (clip.state?.includes('is-playing') && /^https:\/\/.*apple/.test(clip.src || '') && clip.time > 0) ||
+  clip.copy?.includes('No clip');
+check('clip plays or says so honestly', clipOk, JSON.stringify(clip));
+if (clip.state?.includes('is-playing')) {
+  await page.locator('.drawer-preview > button').click();
+  await page.waitForTimeout(400);
+  check('clip pauses on the second tap',
+    !(await page.evaluate(() => document.querySelector('.drawer-preview').className.includes('is-playing'))));
+}
+
 console.log(`\n${errors.length ? errors.join('\n') : 'no console or page errors'}`);
 console.log(failures ? `\n${failures} check(s) failed` : '\nall checks passed');
 await ctx.close();
