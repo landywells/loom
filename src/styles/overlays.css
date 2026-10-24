@@ -103,7 +103,9 @@
   display: flex;
   flex-direction: column;
   width: min(515px, 100%);
-  height: 100dvh;
+  /* Fills its backdrop rather than the viewport, so the desktop title bar
+     offsetting the backdrop cannot push the footer off the bottom of the screen. */
+  height: 100%;
   overflow: hidden;
   border-left: 1px solid var(--line);
   background: var(--bg-elevated);

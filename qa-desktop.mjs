@@ -133,6 +133,18 @@ await page.locator('.media-card').first().click();
 await page.waitForTimeout(500);
 const drawer = await page.evaluate(() => Math.round(document.querySelector('.drawer-backdrop')?.getBoundingClientRect().top));
 check('drawer starts under the chrome', drawer === 40, `top=${drawer}`);
+const editBox = await page.evaluate(() => {
+  const b = document.querySelector('.drawer-edit');
+  if (!b) return { missing: true };
+  const r = b.getBoundingClientRect();
+  return { top: Math.round(r.top), bottom: Math.round(r.bottom), vh: window.innerHeight };
+});
+check('the Edit button is fully on screen', editBox.bottom <= editBox.vh && editBox.top >= 40, JSON.stringify(editBox));
+await page.locator('.drawer-edit').click();
+await page.waitForTimeout(600);
+check('edit opens the form from the desktop drawer', (await page.locator('.item-form').count()) === 1);
+const prefill = await page.locator('input[placeholder="The thing itself"]').inputValue().catch(() => '');
+check('the form arrives filled in', prefill.length > 2, prefill);
 await page.screenshot({ path: 'verify-desktop-drawer.png' });
 
 console.log(`\n${errors.length ? errors.join('\n') : 'no console or page errors'}`);

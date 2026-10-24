@@ -112,6 +112,20 @@ await page.locator('button[aria-label="Increase progress"]').click();
 await page.waitForTimeout(400);
 const progressAfter = await readProgress();
 check('progress steps forward', progressBefore !== progressAfter, `${progressBefore} → ${progressAfter}`);
+const beforeEdit = await page.locator('.item-drawer h1, .item-drawer .drawer-title').first().innerText();
+await page.locator('.drawer-edit').click();
+await page.waitForSelector('.item-form');
+const editField = page.locator('input[placeholder="The thing itself"]');
+check('edit opens with the current title', (await editField.inputValue()) === beforeEdit.trim(), beforeEdit);
+await editField.fill('Renamed By The Regression Test');
+await page.locator('.item-form button[type="submit"]').click();
+await page.waitForTimeout(800);
+const renamed = await page.evaluate(() =>
+  JSON.parse(localStorage.getItem('loom.library.v1')).items.some((i) => i.title === 'Renamed By The Regression Test'));
+check('an edit is saved', renamed);
+
+await page.waitForTimeout(700);
+check('saving an edit returns you to the entry', (await page.locator('.item-drawer').count()) === 1);
 await page.keyboard.press('Escape');
 await page.waitForTimeout(300);
 check('escape closes the drawer', (await page.locator('.item-drawer').count()) === 0);
