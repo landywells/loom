@@ -103,15 +103,11 @@ pub fn run() {
             }))
             .setup(|app| {
                 let handle = app.handle().clone();
+                // A frameless window has no frame for Windows to maximize
+                // against, so the size has to be right in the config: 1180x760
+                // fits a 1080p screen at 125% scaling with room for the taskbar.
                 app.set_menu(app_menu::build(&handle)?)?;
 
-                // The OS fits a maximized window to the work area exactly, at
-                // any scale factor, which no amount of size arithmetic here can
-                // get right. Geometry is deliberately not remembered: restoring
-                // it was overriding this call.
-                if let Some(window) = app.get_webview_window("main") {
-                    let _ = window.maximize();
-                }
                 Ok(())
             })
             .on_menu_event(|app_handle, event| {

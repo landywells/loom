@@ -14,16 +14,15 @@
       {
         "label": "main",
         "title": "Loom",
-        "width": 1320,
-        "height": 880,
-        "minWidth": 980,
-        "minHeight": 640,
+        "width": 1180,
+        "height": 760,
+        "minWidth": 900,
+        "minHeight": 600,
         "center": true,
         "resizable": true,
         "decorations": false,
         "shadow": true,
-        "backgroundColor": "#f2ede3",
-        "maximized": true
+        "backgroundColor": "#f2ede3"
       }
     ],
     "security": {
